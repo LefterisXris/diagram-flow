@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+/implementation-phase*.md
+/IMPLEMENTATION_TEMPLATES_INDEX.md
