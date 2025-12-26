@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* CSS custom properties for theming will be added here */
+:root {
+  /* Variables will be set by ThemeContext */
+}
