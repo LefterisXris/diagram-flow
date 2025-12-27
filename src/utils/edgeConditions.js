@@ -18,8 +18,45 @@ export const applyConditionalEdgeStyle = (style = {}, conditionType) => {
     return style;
   }
 
+  const nextStyle = { ...style, stroke };
+  if (conditionType === "default") {
+    nextStyle.strokeDasharray = "6,4";
+  } else if ("strokeDasharray" in nextStyle) {
+    delete nextStyle.strokeDasharray;
+  }
+
+  return nextStyle;
+};
+
+export const getConditionalEdgeLabel = (edge) => {
+  const data = createConditionalEdgeData(edge?.data);
+  return data.label || data.condition || edge?.label || "";
+};
+
+export const applyConditionalEdgeHighlight = (style = {}, isHighlighted) => {
+  if (!isHighlighted) {
+    return style;
+  }
+
+  const strokeWidth = style.strokeWidth || 2;
   return {
     ...style,
-    stroke,
+    strokeWidth: Math.max(strokeWidth, 3),
+  };
+};
+
+export const normalizeConditionalEdge = (edge) => {
+  const data = createConditionalEdgeData({
+    ...edge.data,
+    label: edge.data?.label || edge.label || "",
+  });
+  const label = getConditionalEdgeLabel({ ...edge, data });
+  const style = applyConditionalEdgeStyle(edge.style || {}, data.conditionType);
+
+  return {
+    ...edge,
+    data,
+    label,
+    style,
   };
 };

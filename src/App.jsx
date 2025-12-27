@@ -13,6 +13,7 @@ import { useSession } from "./hooks/useSession";
 import { exportDiagram } from "./utils/exportDiagram";
 import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
+import { applyConditionalEdgeHighlight, normalizeConditionalEdge } from "./utils/edgeConditions";
 
 // Wrapper component to access ReactFlow context
 function DiagramContent({
@@ -24,6 +25,8 @@ function DiagramContent({
   onNodeClick,
   onEdgeClick,
   onPaneClick,
+  onNodeMouseEnter,
+  onNodeMouseLeave,
   setEdges,
   setNodes,
   selectedNode,
@@ -107,6 +110,8 @@ function DiagramContent({
           onNodeClick={onNodeClick}
           onEdgeClick={onEdgeClick}
           onPaneClick={onPaneClick}
+          onNodeMouseEnter={onNodeMouseEnter}
+          onNodeMouseLeave={onNodeMouseLeave}
           setEdges={setEdges}
         />
         {selectedNode && (
@@ -154,6 +159,7 @@ function App() {
 
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState(null);
+  const [hoveredDecisionNodeId, setHoveredDecisionNodeId] = useState(null);
   const [currentDiagramId, setCurrentDiagramId] = useState(null);
   const [currentDiagramName, setCurrentDiagramName] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -205,8 +211,22 @@ function App() {
     setSelectedEdgeId(null);
   };
 
+  const handleNodeMouseEnter = (event, node) => {
+    if (node.type === "decision") {
+      setHoveredDecisionNodeId(node.id);
+    }
+  };
+
+  const handleNodeMouseLeave = (event, node) => {
+    if (node.type === "decision") {
+      setHoveredDecisionNodeId(null);
+    }
+  };
+
   const updateEdge = (edgeId, updater) => {
-    setEdges((eds) => eds.map((edge) => (edge.id === edgeId ? updater(edge) : edge)));
+    setEdges((eds) =>
+      eds.map((edge) => (edge.id === edgeId ? normalizeConditionalEdge(updater(edge)) : edge))
+    );
   };
 
   const selectedEdge = selectedEdgeId
@@ -215,6 +235,21 @@ function App() {
   const selectedEdgeSource = selectedEdge
     ? nodes.find((node) => node.id === selectedEdge.source)
     : null;
+
+  useEffect(() => {
+    setEdges((eds) =>
+      eds.map((edge) => {
+        const normalized = normalizeConditionalEdge(edge);
+        const isOutgoing = hoveredDecisionNodeId && normalized.source === hoveredDecisionNodeId;
+        const style = applyConditionalEdgeHighlight(normalized.style, isOutgoing);
+
+        return {
+          ...normalized,
+          style,
+        };
+      })
+    );
+  }, [hoveredDecisionNodeId, setEdges]);
 
   const handleExportComplete = () => {
     // Optional: Show toast notification or feedback
@@ -294,6 +329,8 @@ function App() {
           onNodeClick={handleNodeClick}
           onEdgeClick={handleEdgeClick}
           onPaneClick={handlePaneClick}
+          onNodeMouseEnter={handleNodeMouseEnter}
+          onNodeMouseLeave={handleNodeMouseLeave}
           setEdges={setEdges}
           setNodes={setNodes}
           selectedNode={selectedNode}

@@ -3,7 +3,7 @@
  * Parses Mermaid flowchart syntax and converts to DiagramFlow format
  */
 
-import { createConditionalEdgeData } from "./edgeConditions";
+import { createConditionalEdgeData, normalizeConditionalEdge } from "./edgeConditions";
 
 /**
  * Parse Mermaid code and convert to DiagramFlow nodes and edges
@@ -53,16 +53,18 @@ export function parseMermaid(mermaidCode) {
       }
 
       // Create edge
-      edges.push({
-        id: crypto.randomUUID(),
-        source,
-        target,
-        label: label || '',
-        animated: style.animated,
-        type: 'smoothstep',
-        style: style.edgeStyle,
-        data: createConditionalEdgeData(),
-      });
+      edges.push(
+        normalizeConditionalEdge({
+          id: crypto.randomUUID(),
+          source,
+          target,
+          label: label || '',
+          animated: style.animated,
+          type: 'smoothstep',
+          style: style.edgeStyle,
+          data: createConditionalEdgeData({ label: label || "" }),
+        })
+      );
       continue;
     }
 

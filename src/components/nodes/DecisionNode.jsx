@@ -1,9 +1,17 @@
-import { Handle, Position } from "reactflow";
+import { Handle, Position, useStore } from "reactflow";
 import * as Icons from "lucide-react";
 
-const DecisionNode = ({ data, selected }) => {
+const DecisionNode = ({ id, data, selected }) => {
   // Dynamically get icon component, fallback to GitBranch if not found
   const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.GitBranch;
+  const outgoingEdges = useStore((state) =>
+    state.edges.filter((edge) => edge.source === id)
+  );
+  const outgoingCount = outgoingEdges.length;
+  const hasTruePath = outgoingEdges.some((edge) => edge.data?.conditionType === "true");
+  const hasDefaultPath = outgoingEdges.some((edge) => edge.data?.conditionType === "default");
+  const showDefaultWarning = outgoingCount > 0 && !hasDefaultPath;
+  const showTrueWarning = outgoingCount > 0 && !hasTruePath;
 
   return (
     <div
@@ -15,6 +23,41 @@ const DecisionNode = ({ data, selected }) => {
         boxShadow: selected ? "0 0 0 3px rgba(249, 115, 22, 0.3)" : "var(--shadow-lg)",
       }}
     >
+      {outgoingCount > 0 && (
+        <div
+          className="absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-semibold"
+          style={{
+            backgroundColor: "#f59e0b",
+            color: "#1f2937",
+          }}
+        >
+          {outgoingCount}
+        </div>
+      )}
+      {showDefaultWarning && (
+        <div
+          className="absolute -top-2 -left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+          style={{
+            backgroundColor: "#fef3c7",
+            color: "#b45309",
+          }}
+          title="No default path defined"
+        >
+          No default
+        </div>
+      )}
+      {showTrueWarning && (
+        <div
+          className="absolute -bottom-2 -left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+          style={{
+            backgroundColor: "#fee2e2",
+            color: "#b91c1c",
+          }}
+          title="At least one true path required"
+        >
+          No true path
+        </div>
+      )}
       {/* Top handle */}
       <Handle
         type="target"

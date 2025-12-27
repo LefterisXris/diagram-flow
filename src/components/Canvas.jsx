@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import ReactFlow, { Background, Controls, addEdge, useReactFlow } from "reactflow";
 import "reactflow/dist/style.css";
 import { nodeTypes } from "../config/nodeTypes";
-import { applyConditionalEdgeStyle, createConditionalEdgeData } from "../utils/edgeConditions";
+import { createConditionalEdgeData, normalizeConditionalEdge } from "../utils/edgeConditions";
 
 const Canvas = ({
   nodes,
@@ -13,6 +13,8 @@ const Canvas = ({
   onNodeClick,
   onEdgeClick,
   onPaneClick,
+  onNodeMouseEnter,
+  onNodeMouseLeave,
   setEdges,
 }) => {
   const { screenToFlowPosition } = useReactFlow();
@@ -34,18 +36,14 @@ const Canvas = ({
     const edgeData = createConditionalEdgeData({
       conditionType: isDecisionSource ? "true" : "",
     });
-    const conditionalStyle = isDecisionSource
-      ? applyConditionalEdgeStyle({}, edgeData.conditionType)
-      : null;
 
-    const newEdge = {
+    const newEdge = normalizeConditionalEdge({
       ...params,
       id: crypto.randomUUID(),
       animated: true,
       type: "smoothstep",
       data: edgeData,
-      ...(conditionalStyle ? { style: conditionalStyle } : {}),
-    };
+    });
     setEdges((eds) => addEdge(newEdge, eds));
   }, [nodes, setEdges]);
 
@@ -71,6 +69,8 @@ const Canvas = ({
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
         onPaneClick={onPaneClick}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
         nodeTypes={memoizedNodeTypes}
         fitView
         style={{ backgroundColor: "var(--bg-primary)" }}

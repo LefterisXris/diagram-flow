@@ -693,17 +693,17 @@ Phase 3 Step 6 Completion Notes (2024-12-27):
   - [x] Condition type dropdown
   - [ ] Add syntax helper/validator
 
-- [ ] **Visual Indicators for Conditions**
-  - [ ] Display condition label on edges
-  - [ ] Style edges based on condition type (solid/dashed, colors)
-  - [ ] Show badge on decision node (number of conditions)
+- [x] **Visual Indicators for Conditions**
+  - [x] Display condition label on edges
+  - [x] Style edges based on condition type (solid/dashed, colors)
+  - [x] Show badge on decision node (number of conditions)
   - [ ] Add validation warnings
 
 - [ ] **Implement Multiple Outputs**
-  - [ ] Allow 2+ edges from decision node
-  - [ ] Validate: at least 1 true path
-  - [ ] Show warning if no default path
-  - [ ] Highlight all paths on decision node hover
+  - [x] Allow 2+ edges from decision node
+  - [x] Validate: at least 1 true path
+  - [x] Show warning if no default path
+  - [x] Highlight all paths on decision node hover
 
 ### Demo Checklist
 - [ ] Create workflow with 2-3 decision nodes

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNodesState, useEdgesState } from "reactflow";
-import { applyConditionalEdgeStyle, createConditionalEdgeData } from "../utils/edgeConditions";
+import { normalizeConditionalEdge } from "../utils/edgeConditions";
 
 const STORAGE_KEY = "diagram_current";
 const AUTOSAVE_DELAY = 30000; // 30 seconds
@@ -17,19 +17,7 @@ export const useDiagramState = () => {
     if (saved) {
       try {
         const { nodes: savedNodes, edges: savedEdges } = JSON.parse(saved);
-        const normalizedEdges = (savedEdges || []).map((edge) => {
-          const data = createConditionalEdgeData({
-            ...edge.data,
-            label: edge.data?.label || edge.label || "",
-          });
-          const style = applyConditionalEdgeStyle(edge.style || {}, data.conditionType);
-
-          return {
-            ...edge,
-            data,
-            style,
-          };
-        });
+        const normalizedEdges = (savedEdges || []).map((edge) => normalizeConditionalEdge(edge));
         setNodes(savedNodes || []);
         setEdges(normalizedEdges);
         setIsDirty(false);
