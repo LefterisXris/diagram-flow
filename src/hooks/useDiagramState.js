@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useNodesState, useEdgesState } from "reactflow";
 
 const STORAGE_KEY = "diagram_current";
-const AUTOSAVE_DELAY = 10000; // 10 seconds
+const AUTOSAVE_DELAY = 30000; // 30 seconds
 
 export const useDiagramState = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [lastSaved, setLastSaved] = useState(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -17,22 +18,19 @@ export const useDiagramState = () => {
         const { nodes: savedNodes, edges: savedEdges } = JSON.parse(saved);
         setNodes(savedNodes || []);
         setEdges(savedEdges || []);
+        setIsDirty(false);
       } catch (e) {
         console.error("Failed to load diagram:", e);
       }
     }
   }, [setNodes, setEdges]);
 
-  // Auto-save to localStorage
+  // Mark as dirty when nodes or edges change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const data = { nodes, edges, lastModified: Date.now() };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      setLastSaved(Date.now());
-    }, AUTOSAVE_DELAY);
-
-    return () => clearTimeout(timer);
-  }, [nodes, edges]);
+    if (lastSaved !== null) {
+      setIsDirty(true);
+    }
+  }, [nodes, edges, lastSaved]);
 
   const addNode = useCallback((position, type = "generic", icon = null) => {
     const now = new Date().toISOString();
@@ -88,6 +86,24 @@ export const useDiagramState = () => {
     );
   }, [setNodes]);
 
+  // Manual save function that can include viewport
+  const saveState = useCallback((viewport = null) => {
+    const data = {
+      nodes,
+      edges,
+      viewport,
+      lastModified: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setLastSaved(Date.now());
+    setIsDirty(false);
+  }, [nodes, edges]);
+
+  // Auto-save with debounce (called from parent with viewport)
+  const triggerAutoSave = useCallback((viewport) => {
+    saveState(viewport);
+  }, [saveState]);
+
   return {
     nodes,
     edges,
@@ -99,5 +115,8 @@ export const useDiagramState = () => {
     setNodes,
     setEdges,
     lastSaved,
+    isDirty,
+    saveState,
+    triggerAutoSave,
   };
 };

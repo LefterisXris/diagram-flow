@@ -1,8 +1,9 @@
-import { Layout, Download, Upload, Save, FolderOpen } from "lucide-react";
+import { Layout, Download, Upload, Save, FolderOpen, GitMerge } from "lucide-react";
 import { useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
+import SaveStatus from "./SaveStatus";
 
-const Header = ({ onExport, onImport, onSave, onOpen }) => {
+const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, lastSaved }) => {
   const fileInputRef = useRef(null);
 
   const handleImportClick = () => {
@@ -35,6 +36,7 @@ const Header = ({ onExport, onImport, onSave, onOpen }) => {
           <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
             DiagramFlow
           </h1>
+          <SaveStatus isDirty={isDirty} lastSaved={lastSaved} />
         </div>
 
         <div className="flex items-center gap-3">
@@ -88,6 +90,20 @@ const Header = ({ onExport, onImport, onSave, onOpen }) => {
                 Import
               </button>
             </>
+          )}
+          {onImportMermaid && (
+            <button
+              onClick={onImportMermaid}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium border"
+              style={{
+                borderColor: "var(--border-primary)",
+                color: "var(--text-primary)",
+              }}
+              title="Import from Mermaid"
+            >
+              <GitMerge className="w-4 h-4" />
+              Mermaid
+            </button>
           )}
           {onExport && (
             <button
