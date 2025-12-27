@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Handle, Position, useStore } from "reactflow";
 import * as Icons from "lucide-react";
 
-const DecisionNode = ({ id, data, selected }) => {
+const DecisionNode = memo(({ id, data, selected }) => {
   // Dynamically get icon component, fallback to GitBranch if not found
   const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.GitBranch;
   const outgoingEdges = useStore((state) =>
@@ -107,6 +108,8 @@ const DecisionNode = ({ id, data, selected }) => {
       />
     </div>
   );
-};
+});
+
+DecisionNode.displayName = 'DecisionNode';
 
 export default DecisionNode;

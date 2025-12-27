@@ -1,0 +1,721 @@
+{
+  "version": "1.0.0",
+  "metadata": {
+    "id": "ecommerce-order-processing-v1",
+    "name": "E-Commerce Order Processing System",
+    "description": "Complete order processing flow for an online retail platform with payment processing, inventory management, and fraud detection",
+    "author": "Platform Engineering Team",
+    "createdAt": "2025-12-27T10:00:00Z",
+    "lastModified": "2025-12-27T15:30:00Z",
+    "tags": ["e-commerce", "microservices", "order-processing", "payment"],
+    "version": "2.1.0"
+  },
+  "nodes": [
+    {
+      "id": "client-web",
+      "name": "Web Client",
+      "type": "client",
+      "position": { "x": 100, "y": 300 },
+      "icon": "Globe",
+      "shortDescription": "React-based web application for customer shopping",
+      "detailedDescription": "# Web Client\n\n## Overview\nModern single-page application built with React 18 and TypeScript.\n\n## Features\n- Product browsing and search\n- Shopping cart management\n- User authentication (OAuth 2.0)\n- Order placement and tracking\n- Payment processing UI\n\n## Tech Stack\n- React 18.2\n- TypeScript 5.0\n- Redux Toolkit for state management\n- Tailwind CSS for styling\n- Vite for bundling",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Frontend Team",
+        "version": "3.5.2",
+        "criticality": "high",
+        "tags": ["frontend", "react", "typescript", "spa"],
+        "links": [
+          { "url": "https://docs.example.com/web-client", "label": "Documentation" },
+          { "url": "https://github.com/example/web-client", "label": "Repository" }
+        ],
+        "dateAdded": "2024-01-15T10:00:00Z",
+        "dateModified": "2025-12-20T14:30:00Z",
+        "author": "Frontend Team"
+      }
+    },
+    {
+      "id": "client-mobile",
+      "name": "Mobile App",
+      "type": "client",
+      "position": { "x": 100, "y": 500 },
+      "icon": "Smartphone",
+      "shortDescription": "Native iOS and Android shopping applications",
+      "detailedDescription": "# Mobile App\n\n## Overview\nCross-platform mobile application built with React Native.\n\n## Features\n- Native performance on iOS and Android\n- Push notifications for order updates\n- Biometric authentication\n- Offline cart persistence\n- AR product preview",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Mobile Team",
+        "version": "2.8.1",
+        "criticality": "high",
+        "tags": ["mobile", "react-native", "ios", "android"],
+        "dateAdded": "2024-03-10T09:00:00Z",
+        "dateModified": "2025-12-15T11:20:00Z"
+      }
+    },
+    {
+      "id": "api-gateway",
+      "name": "API Gateway",
+      "type": "service",
+      "position": { "x": 400, "y": 400 },
+      "icon": "Shield",
+      "shortDescription": "Main entry point with authentication and rate limiting",
+      "detailedDescription": "# API Gateway\n\n## Responsibilities\n- JWT token validation\n- Rate limiting (1000 req/min per user)\n- Request routing to microservices\n- Response caching\n\n## Tech Stack\n- Node.js 20.x + Express.js 4.18\n- Redis for rate limiting\n- Kong Gateway\n\n## Performance\n- Avg response time: 15ms\n- 99.99% uptime SLA",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Platform Team",
+        "version": "4.2.0",
+        "criticality": "critical",
+        "tags": ["gateway", "auth", "nodejs"],
+        "links": [
+          { "url": "https://docs.example.com/api-gateway", "label": "API Docs" }
+        ],
+        "dateAdded": "2023-11-20T08:00:00Z"
+      }
+    },
+    {
+      "id": "auth-service",
+      "name": "Auth Service",
+      "type": "service",
+      "position": { "x": 700, "y": 250 },
+      "icon": "Lock",
+      "shortDescription": "User authentication and authorization service",
+      "detailedDescription": "# Authentication Service\n\n## Features\n- OAuth 2.0 / OpenID Connect\n- Multi-factor authentication (MFA)\n- Role-based access control (RBAC)\n\n## Tech Stack\n- Java 17 + Spring Boot 3.1\n- Spring Security\n- PostgreSQL + Redis",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Security Team",
+        "version": "3.1.5",
+        "criticality": "critical",
+        "tags": ["auth", "security", "java"],
+        "dateAdded": "2023-10-05T12:00:00Z"
+      }
+    },
+    {
+      "id": "decision-auth-check",
+      "name": "Auth Valid?",
+      "type": "decision",
+      "position": { "x": 700, "y": 400 },
+      "icon": "GitBranch",
+      "shortDescription": "Validates user authentication token",
+      "detailedDescription": "# Authentication Check\n\nValidates JWT token:\n- Token expiration\n- Token signature\n- User permissions\n- Account status",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Security Team",
+        "criticality": "critical",
+        "tags": ["decision", "auth"],
+        "dateAdded": "2024-01-20T10:00:00Z"
+      }
+    },
+    {
+      "id": "order-service",
+      "name": "Order Service",
+      "type": "service",
+      "position": { "x": 1000, "y": 400 },
+      "icon": "ShoppingCart",
+      "shortDescription": "Manages order creation and lifecycle",
+      "detailedDescription": "# Order Service\n\n## Responsibilities\n- Order creation and validation\n- Order status tracking\n- Order history and notifications\n\n## Tech Stack\n- Python 3.11 + FastAPI\n- PostgreSQL (100M+ orders)\n- RabbitMQ + Redis",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Order Management Team",
+        "version": "5.3.1",
+        "criticality": "critical",
+        "tags": ["orders", "python", "fastapi"],
+        "links": [
+          { "url": "https://docs.example.com/order-service", "label": "API Docs" }
+        ],
+        "dateAdded": "2023-12-01T08:30:00Z"
+      }
+    },
+    {
+      "id": "inventory-service",
+      "name": "Inventory Service",
+      "type": "service",
+      "position": { "x": 1300, "y": 250 },
+      "icon": "Package",
+      "shortDescription": "Real-time inventory and stock management",
+      "detailedDescription": "# Inventory Service\n\n## Features\n- Real-time stock checking\n- Stock reservation\n- Multi-warehouse support\n- Low stock alerts\n\n## Tech Stack\n- Go 1.21\n- PostgreSQL + Redis\n- 10K checks/second, <20ms response",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Supply Chain Team",
+        "version": "4.0.2",
+        "criticality": "high",
+        "tags": ["inventory", "golang"],
+        "dateAdded": "2024-02-15T11:00:00Z"
+      }
+    },
+    {
+      "id": "decision-stock-available",
+      "name": "Stock Available?",
+      "type": "decision",
+      "position": { "x": 1300, "y": 400 },
+      "icon": "GitBranch",
+      "shortDescription": "Checks if items are in stock",
+      "detailedDescription": "# Stock Check\n\nValidates:\n- Sufficient quantity\n- Item not discontinued\n- Warehouse location",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Supply Chain Team",
+        "criticality": "high",
+        "tags": ["decision", "inventory"],
+        "dateAdded": "2024-02-20T09:00:00Z"
+      }
+    },
+    {
+      "id": "fraud-detection",
+      "name": "Fraud Detection",
+      "type": "service",
+      "position": { "x": 1000, "y": 600 },
+      "icon": "AlertTriangle",
+      "shortDescription": "ML-based fraud detection and risk scoring",
+      "detailedDescription": "# Fraud Detection\n\n## Risk Scoring\n- ML models (Random Forest + XGBoost)\n- Velocity checks\n- Geolocation analysis\n- Device fingerprinting\n\n## Thresholds\n- Low: <20 (auto-approve)\n- Medium: 20-70 (review)\n- High: >70 (reject)",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Risk Team",
+        "version": "2.7.3",
+        "criticality": "high",
+        "tags": ["fraud", "ml", "python"],
+        "dateAdded": "2024-05-10T10:00:00Z"
+      }
+    },
+    {
+      "id": "decision-fraud-check",
+      "name": "Fraud Score OK?",
+      "type": "decision",
+      "position": { "x": 1300, "y": 600 },
+      "icon": "GitBranch",
+      "shortDescription": "Evaluates fraud risk score",
+      "detailedDescription": "# Fraud Evaluation\n\nChecks:\n- ML model score\n- Customer history\n- Risk threshold (<70)",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Risk Team",
+        "criticality": "high",
+        "tags": ["decision", "fraud"],
+        "dateAdded": "2024-05-15T12:00:00Z"
+      }
+    },
+    {
+      "id": "payment-service",
+      "name": "Payment Service",
+      "type": "service",
+      "position": { "x": 1600, "y": 400 },
+      "icon": "CreditCard",
+      "shortDescription": "Multi-gateway payment processing",
+      "detailedDescription": "# Payment Service\n\n## Payment Methods\n- Credit/Debit (Stripe, Braintree)\n- PayPal, Apple Pay, Google Pay\n- BNPL (Klarna, Affirm)\n\n## Features\n- PCI DSS Level 1 compliant\n- 3D Secure authentication\n- 150+ currencies",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Payments Team",
+        "version": "6.1.0",
+        "criticality": "critical",
+        "tags": ["payments", "java", "pci-dss"],
+        "links": [
+          { "url": "https://docs.example.com/payment-service", "label": "API Docs" }
+        ],
+        "dateAdded": "2023-11-15T09:00:00Z"
+      }
+    },
+    {
+      "id": "decision-payment-success",
+      "name": "Payment Success?",
+      "type": "decision",
+      "position": { "x": 1900, "y": 400 },
+      "icon": "GitBranch",
+      "shortDescription": "Validates payment result",
+      "detailedDescription": "# Payment Validation\n\nChecks:\n- Authorization status\n- Sufficient funds\n- 3D Secure verified",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Payments Team",
+        "criticality": "critical",
+        "tags": ["decision", "payment"],
+        "dateAdded": "2024-01-05T10:00:00Z"
+      }
+    },
+    {
+      "id": "notification-service",
+      "name": "Notification Service",
+      "type": "service",
+      "position": { "x": 2200, "y": 300 },
+      "icon": "Bell",
+      "shortDescription": "Multi-channel notifications",
+      "detailedDescription": "# Notifications\n\n## Channels\n- Email (SendGrid)\n- SMS (Twilio)\n- Push (Firebase)\n- In-app\n\n## Features\n- Template management\n- A/B testing\n- Delivery tracking",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Communications Team",
+        "version": "3.4.1",
+        "criticality": "medium",
+        "tags": ["notifications", "nodejs"],
+        "dateAdded": "2024-01-10T11:00:00Z"
+      }
+    },
+    {
+      "id": "fulfillment-service",
+      "name": "Fulfillment Service",
+      "type": "service",
+      "position": { "x": 2200, "y": 500 },
+      "icon": "Truck",
+      "shortDescription": "Order fulfillment and shipping",
+      "detailedDescription": "# Fulfillment\n\n## Operations\n- Warehouse assignment\n- Picking and packing\n- Shipping labels\n- Carrier integration (FedEx, UPS)\n\n## Metrics\n- Same-day shipping: 95%\n- Accuracy: 99.8%",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Logistics Team",
+        "version": "4.5.0",
+        "criticality": "high",
+        "tags": ["fulfillment", "dotnet"],
+        "dateAdded": "2024-03-01T08:00:00Z"
+      }
+    },
+    {
+      "id": "db-orders",
+      "name": "Orders DB",
+      "type": "database",
+      "position": { "x": 1000, "y": 200 },
+      "icon": "Database",
+      "shortDescription": "PostgreSQL database for orders",
+      "detailedDescription": "# Orders Database\n\n## Schema\n- orders (100M+ rows)\n- order_items\n- order_history\n\n## Config\n- PostgreSQL 15.3\n- Master + 3 replicas\n- Daily backups",
+      "metadata": {
+        "status": "deployed",
+        "owner": "DBA Team",
+        "version": "15.3",
+        "criticality": "critical",
+        "tags": ["database", "postgresql"],
+        "dateAdded": "2023-11-25T10:00:00Z"
+      }
+    },
+    {
+      "id": "db-inventory",
+      "name": "Inventory DB",
+      "type": "database",
+      "position": { "x": 1300, "y": 100 },
+      "icon": "Database",
+      "shortDescription": "PostgreSQL for inventory data",
+      "detailedDescription": "# Inventory Database\n\n## Schema\n- products (5M+ SKUs)\n- warehouse_stock\n- stock_reservations\n\n## Config\n- PostgreSQL 15.3\n- High-availability setup",
+      "metadata": {
+        "status": "deployed",
+        "owner": "DBA Team",
+        "version": "15.3",
+        "criticality": "critical",
+        "tags": ["database", "postgresql"],
+        "dateAdded": "2024-02-10T09:00:00Z"
+      }
+    },
+    {
+      "id": "error-out-of-stock",
+      "name": "Out of Stock",
+      "type": "generic",
+      "position": { "x": 1300, "y": 550 },
+      "icon": "XCircle",
+      "shortDescription": "Handles out-of-stock scenarios",
+      "detailedDescription": "# Out of Stock\n\n## Actions\n- Notify customer\n- Offer alternatives\n- Add to waitlist\n- Cancel order",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Order Team",
+        "criticality": "medium",
+        "tags": ["error-handling"],
+        "dateAdded": "2024-03-15T10:00:00Z"
+      }
+    },
+    {
+      "id": "error-fraud-detected",
+      "name": "Fraud Rejected",
+      "type": "generic",
+      "position": { "x": 1600, "y": 700 },
+      "icon": "ShieldAlert",
+      "shortDescription": "Handles high-risk orders",
+      "detailedDescription": "# Fraud Rejection\n\n## Actions\n- Block transaction\n- Notify risk team\n- Log fraud attempt\n- Update risk profile",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Risk Team",
+        "criticality": "high",
+        "tags": ["fraud", "security"],
+        "dateAdded": "2024-05-20T11:00:00Z"
+      }
+    },
+    {
+      "id": "error-payment-failed",
+      "name": "Payment Failed",
+      "type": "generic",
+      "position": { "x": 1900, "y": 550 },
+      "icon": "CreditCard",
+      "shortDescription": "Handles payment failures",
+      "detailedDescription": "# Payment Failure\n\n## Actions\n- Retry (3 attempts)\n- Notify customer\n- Suggest alternatives\n- Hold order 24h",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Payments Team",
+        "criticality": "high",
+        "tags": ["payment", "retry"],
+        "dateAdded": "2024-01-08T09:00:00Z"
+      }
+    },
+    {
+      "id": "error-unauthorized",
+      "name": "Unauthorized",
+      "type": "generic",
+      "position": { "x": 700, "y": 550 },
+      "icon": "ShieldX",
+      "shortDescription": "Handles auth failures",
+      "detailedDescription": "# Unauthorized Access\n\n## Actions\n- Return 401\n- Log security event\n- Track attempts\n- Lockout after 5 failures",
+      "metadata": {
+        "status": "deployed",
+        "owner": "Security Team",
+        "criticality": "high",
+        "tags": ["auth", "security"],
+        "dateAdded": "2024-01-25T10:00:00Z"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "source": "client-web",
+      "target": "api-gateway",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "HTTPS"
+    },
+    {
+      "id": "edge-2",
+      "source": "client-mobile",
+      "target": "api-gateway",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "HTTPS"
+    },
+    {
+      "id": "edge-3",
+      "source": "api-gateway",
+      "target": "auth-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Validate Token"
+    },
+    {
+      "id": "edge-4",
+      "source": "auth-service",
+      "target": "decision-auth-check",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "edge-5",
+      "source": "decision-auth-check",
+      "target": "order-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Valid",
+      "data": {
+        "condition": "user.authenticated === true",
+        "conditionType": "true",
+        "priority": 1
+      }
+    },
+    {
+      "id": "edge-6",
+      "source": "decision-auth-check",
+      "target": "error-unauthorized",
+      "type": "smoothstep",
+      "label": "Invalid",
+      "data": {
+        "condition": "user.authenticated === false",
+        "conditionType": "false",
+        "priority": 2
+      }
+    },
+    {
+      "id": "edge-7",
+      "source": "order-service",
+      "target": "db-orders",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Save"
+    },
+    {
+      "id": "edge-8",
+      "source": "order-service",
+      "target": "inventory-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Check Stock"
+    },
+    {
+      "id": "edge-9",
+      "source": "inventory-service",
+      "target": "db-inventory",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Query"
+    },
+    {
+      "id": "edge-10",
+      "source": "inventory-service",
+      "target": "decision-stock-available",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "edge-11",
+      "source": "decision-stock-available",
+      "target": "fraud-detection",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "In Stock",
+      "data": {
+        "condition": "inventory.available === true",
+        "conditionType": "true",
+        "priority": 1
+      }
+    },
+    {
+      "id": "edge-12",
+      "source": "decision-stock-available",
+      "target": "error-out-of-stock",
+      "type": "smoothstep",
+      "label": "Out of Stock",
+      "data": {
+        "condition": "inventory.available === false",
+        "conditionType": "false",
+        "priority": 2
+      }
+    },
+    {
+      "id": "edge-13",
+      "source": "fraud-detection",
+      "target": "decision-fraud-check",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "edge-14",
+      "source": "decision-fraud-check",
+      "target": "payment-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Low Risk",
+      "data": {
+        "condition": "fraud.riskScore < 70",
+        "conditionType": "true",
+        "priority": 1
+      }
+    },
+    {
+      "id": "edge-15",
+      "source": "decision-fraud-check",
+      "target": "error-fraud-detected",
+      "type": "smoothstep",
+      "label": "High Risk",
+      "data": {
+        "condition": "fraud.riskScore >= 70",
+        "conditionType": "false",
+        "priority": 2
+      }
+    },
+    {
+      "id": "edge-16",
+      "source": "payment-service",
+      "target": "decision-payment-success",
+      "type": "smoothstep",
+      "animated": true
+    },
+    {
+      "id": "edge-17",
+      "source": "decision-payment-success",
+      "target": "notification-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Success",
+      "data": {
+        "condition": "payment.status === 'approved'",
+        "conditionType": "true",
+        "priority": 1
+      }
+    },
+    {
+      "id": "edge-18",
+      "source": "decision-payment-success",
+      "target": "error-payment-failed",
+      "type": "smoothstep",
+      "label": "Failed",
+      "data": {
+        "condition": "payment.status === 'declined'",
+        "conditionType": "false",
+        "priority": 2
+      }
+    },
+    {
+      "id": "edge-19",
+      "source": "notification-service",
+      "target": "fulfillment-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Confirmed"
+    },
+    {
+      "id": "edge-20",
+      "source": "decision-payment-success",
+      "target": "fulfillment-service",
+      "type": "smoothstep",
+      "animated": true,
+      "label": "Fulfill"
+    }
+  ],
+  "exampleCases": [
+    {
+      "id": "case-happy-path",
+      "name": "Successful Order - Happy Path",
+      "description": "Complete successful order from start to fulfillment",
+      "input": {
+        "nodeId": "client-web",
+        "data": {
+          "user": {
+            "authenticated": true,
+            "id": "user-12345"
+          },
+          "inventory": {
+            "available": true
+          },
+          "fraud": {
+            "riskScore": 15
+          },
+          "payment": {
+            "status": "approved"
+          }
+        }
+      },
+      "expectedPath": [
+        "client-web",
+        "api-gateway",
+        "auth-service",
+        "decision-auth-check",
+        "order-service",
+        "inventory-service",
+        "decision-stock-available",
+        "fraud-detection",
+        "decision-fraud-check",
+        "payment-service",
+        "decision-payment-success",
+        "notification-service",
+        "fulfillment-service"
+      ]
+    },
+    {
+      "id": "case-out-of-stock",
+      "name": "Out of Stock Error",
+      "description": "Order rejected due to insufficient inventory",
+      "input": {
+        "nodeId": "client-mobile",
+        "data": {
+          "user": {
+            "authenticated": true,
+            "id": "user-67890"
+          },
+          "inventory": {
+            "available": false
+          }
+        }
+      },
+      "expectedPath": [
+        "client-mobile",
+        "api-gateway",
+        "auth-service",
+        "decision-auth-check",
+        "order-service",
+        "inventory-service",
+        "decision-stock-available",
+        "error-out-of-stock"
+      ]
+    },
+    {
+      "id": "case-fraud-detected",
+      "name": "High Fraud Risk Blocked",
+      "description": "Order blocked by fraud detection system",
+      "input": {
+        "nodeId": "client-web",
+        "data": {
+          "user": {
+            "authenticated": true,
+            "id": "user-suspicious"
+          },
+          "inventory": {
+            "available": true
+          },
+          "fraud": {
+            "riskScore": 95
+          }
+        }
+      },
+      "expectedPath": [
+        "client-web",
+        "api-gateway",
+        "auth-service",
+        "decision-auth-check",
+        "order-service",
+        "inventory-service",
+        "decision-stock-available",
+        "fraud-detection",
+        "decision-fraud-check",
+        "error-fraud-detected"
+      ]
+    },
+    {
+      "id": "case-payment-failed",
+      "name": "Payment Declined",
+      "description": "Payment declined by payment gateway",
+      "input": {
+        "nodeId": "client-web",
+        "data": {
+          "user": {
+            "authenticated": true,
+            "id": "user-54321"
+          },
+          "inventory": {
+            "available": true
+          },
+          "fraud": {
+            "riskScore": 22
+          },
+          "payment": {
+            "status": "declined"
+          }
+        }
+      },
+      "expectedPath": [
+        "client-web",
+        "api-gateway",
+        "auth-service",
+        "decision-auth-check",
+        "order-service",
+        "inventory-service",
+        "decision-stock-available",
+        "fraud-detection",
+        "decision-fraud-check",
+        "payment-service",
+        "decision-payment-success",
+        "error-payment-failed"
+      ]
+    },
+    {
+      "id": "case-unauthorized",
+      "name": "Unauthorized Access",
+      "description": "Invalid authentication token",
+      "input": {
+        "nodeId": "client-mobile",
+        "data": {
+          "user": {
+            "authenticated": false,
+            "id": null
+          }
+        }
+      },
+      "expectedPath": [
+        "client-mobile",
+        "api-gateway",
+        "auth-service",
+        "decision-auth-check",
+        "error-unauthorized"
+      ]
+    }
+  ],
+  "layout": {
+    "zoom": 0.6,
+    "center": {
+      "x": 0,
+      "y": 0
+    }
+  }
+}

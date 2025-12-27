@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Handle, Position } from "reactflow";
 import * as Icons from "lucide-react";
 
-const ClientNode = ({ data, selected }) => {
+const ClientNode = memo(({ data, selected }) => {
   // Dynamically get icon component, fallback to Monitor if not found
   const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.Monitor;
 
@@ -71,6 +72,8 @@ const ClientNode = ({ data, selected }) => {
       />
     </div>
   );
-};
+});
+
+ClientNode.displayName = 'ClientNode';
 
 export default ClientNode;

@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 import SaveStatus from "./SaveStatus";
 import { getModKeyDisplay } from "../hooks/useKeyboardShortcuts";
 
-const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, lastSaved, onStartTutorial, searchQuery, onSearchChange, onUndo, onRedo, canUndo, canRedo }) => {
+const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, lastSaved, onStartTutorial, onOpenHelp, searchQuery, onSearchChange, onUndo, onRedo, canUndo, canRedo }) => {
   const fileInputRef = useRef(null);
   const modKey = getModKeyDisplay();
 
@@ -187,15 +187,15 @@ const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, 
               Export
             </button>
           )}
-          {onStartTutorial && (
+          {onOpenHelp && (
             <button
-              onClick={onStartTutorial}
+              onClick={onOpenHelp}
               className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium border"
               style={{
                 borderColor: "var(--border-primary)",
                 color: "var(--text-primary)",
               }}
-              title="Start interactive tutorial (Press ? for keyboard shortcuts)"
+              title="Open user guide and documentation (Press ? for keyboard shortcuts)"
             >
               <HelpCircle className="w-4 h-4" />
               Help

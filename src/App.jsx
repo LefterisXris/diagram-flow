@@ -14,11 +14,14 @@ import ExportDialog from "./components/ExportDialog";
 import WelcomeScreen from "./components/WelcomeScreen";
 import TutorialOverlay from "./components/TutorialOverlay";
 import KeyboardCheatsheet from "./components/KeyboardCheatsheet";
+import HelpPanel from "./components/HelpPanel";
+import LoadingSkeleton from "./components/LoadingSkeleton";
 import { useDiagramState } from "./hooks/useDiagramState";
 import { useSession } from "./hooks/useSession";
 import { useSimulationHistory } from "./hooks/useSimulationHistory";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useHistory } from "./hooks/useHistory";
+import { useDebounce } from "./hooks/useDebounce";
 import { exportDiagram } from "./utils/exportDiagram";
 import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
@@ -73,6 +76,7 @@ function DiagramContent({
   setTemplateJustLoaded,
   setSelectedNode,
   onStartTutorial,
+  onOpenHelp,
   searchQuery,
   onSearchChange,
   filters,
@@ -84,6 +88,10 @@ function DiagramContent({
   validationResult,
   onValidationWarningClick,
   reactFlowWrapperRef,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }) {
   const { getViewport, setViewport, fitView } = useReactFlow();
   const reactFlowWrapper = useRef(null);
@@ -187,10 +195,11 @@ function DiagramContent({
         isDirty={isDirty}
         lastSaved={lastSaved}
         onStartTutorial={onStartTutorial}
+        onOpenHelp={onOpenHelp}
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
+        onUndo={onUndo}
+        onRedo={onRedo}
         canUndo={canUndo}
         canRedo={canRedo}
       />
@@ -309,11 +318,13 @@ function App() {
   const [showMermaidImportDialog, setShowMermaidImportDialog] = useState(false);
   const [pendingViewport, setPendingViewport] = useState(null);
   const [simulationState, setSimulationState] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   const [templateJustLoaded, setTemplateJustLoaded] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showCheatsheet, setShowCheatsheet] = useState(false);
+  const [showHelpPanel, setShowHelpPanel] = useState(false);
 
   // Ref for React Flow container (for advanced exports)
   const reactFlowWrapperRef = useRef(null);
@@ -323,6 +334,7 @@ function App() {
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // Debounce search for performance
   const [filters, setFilters] = useState({
     types: [], // Array of node types to show (empty = show all)
     statuses: [], // Array of statuses to show (empty = show all)
@@ -364,8 +376,8 @@ function App() {
 
   // Search & Filter computed values
   const { visibleNodeIds, visibleCount, totalCount } = useMemo(() => {
-    return getVisibleNodes(nodes, searchQuery, filters);
-  }, [nodes, searchQuery, filters]);
+    return getVisibleNodes(nodes, debouncedSearchQuery, filters);
+  }, [nodes, debouncedSearchQuery, filters]);
 
   const filterOptions = useMemo(() => {
     return extractFilterOptions(nodes);
@@ -445,6 +457,15 @@ function App() {
     if (!hasVisited) {
       setShowWelcomeScreen(true);
     }
+  }, []);
+
+  // Hide loading skeleton after initial render
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500); // Short delay to show skeleton briefly
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Warn before closing tab if unsaved changes
@@ -692,6 +713,15 @@ function App() {
     console.log('Tutorial skipped. You can restart it anytime from the Help menu.');
   };
 
+  // Help panel handlers
+  const handleOpenHelp = () => {
+    setShowHelpPanel(true);
+  };
+
+  const handleCloseHelp = () => {
+    setShowHelpPanel(false);
+  };
+
   // Keyboard shortcut handlers
   const handleDeleteKey = () => {
     if (selectedNode) {
@@ -766,6 +796,11 @@ function App() {
     onShowCheatsheet: handleShowCheatsheet,
   });
 
+  // Show loading skeleton during initial load
+  if (isLoading) {
+    return <LoadingSkeleton />;
+  }
+
   return (
     <div
       className="h-screen flex flex-col"
@@ -816,7 +851,7 @@ function App() {
           onSimulationComplete={handleSimulationComplete}
           templateJustLoaded={templateJustLoaded}
           setTemplateJustLoaded={setTemplateJustLoaded}
-          searchQuery={searchQuery}
+          searchQuery={debouncedSearchQuery}
           onSearchChange={handleSearchChange}
           filters={filters}
           onFiltersChange={handleFiltersChange}
@@ -828,7 +863,12 @@ function App() {
           onValidationWarningClick={handleValidationWarningClick}
           setSelectedNode={setSelectedNode}
           onStartTutorial={handleStartTutorial}
+          onOpenHelp={handleOpenHelp}
           reactFlowWrapperRef={reactFlowWrapperRef}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
       </ReactFlowProvider>
 
@@ -866,6 +906,12 @@ function App() {
       <KeyboardCheatsheet
         isOpen={showCheatsheet}
         onClose={() => setShowCheatsheet(false)}
+      />
+
+      {/* Help Panel */}
+      <HelpPanel
+        isOpen={showHelpPanel}
+        onClose={handleCloseHelp}
       />
 
       {/* Welcome Screen */}

@@ -52,7 +52,16 @@ DiagramFlow is an interactive flow diagram tool for developers and architects. C
 - ✅ **Edge Animation** - Active edges brighten and animate during simulation
 - ✅ **Progress Tracking** - Step counter and progress bar during simulation
 
-### Coming Soon (Phases 6-9)
+### Phase 9 Complete (Documentation & Deployment)
+- ✅ **User Documentation** - Comprehensive user guide with 8 sections
+- ✅ **In-App Help Panel** - Searchable markdown documentation
+- ✅ **Performance Optimization** - Lazy rendering, React.memo, debounced operations
+- ✅ **Landing Page** - Professional landing page with features and CTAs
+- ✅ **GitHub Pages Deployment** - Auto-deploy on push to main
+- ✅ **Testing Documentation** - Complete testing guide with checklists
+- ✅ **Bug Tracking** - GitHub issue templates for bugs, features, questions
+
+### Coming Soon (Phases 6-8)
 - 🔜 **Data Transformation Tracking** - See how data changes at each node
 - 🔜 **Data Inspector Panel** - View input/output data at each step
 - 🔜 **Conditional Evaluation Display** - See which conditions evaluated to true/false
@@ -75,7 +84,7 @@ DiagramFlow is an interactive flow diagram tool for developers and architects. C
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/diagramflow.git
+git clone https://github.com/LefterisXris/diagram-flow.git
 cd diagramflow
 
 # Install dependencies
@@ -86,6 +95,17 @@ npm run dev
 ```
 
 The app will open at **http://localhost:5173**
+
+### Try an Example
+
+DiagramFlow includes realistic example diagrams in the `examples/` directory:
+
+1. **Start the app**: `npm run dev`
+2. **Click "Import"** in the header
+3. **Select** `examples/ecommerce-order-processing.json`
+4. **Explore** the complete e-commerce system with 19 nodes and 5 simulation scenarios
+
+See [examples/README.md](examples/README.md) for more details.
 
 ### Health Check
 
@@ -255,6 +275,9 @@ diagramflow/
 │   ├── App.jsx                   # Root component
 │   ├── main.jsx                  # Entry point
 │   └── index.css                 # Global styles + animations
+├── examples/                     # Example diagrams
+│   ├── ecommerce-order-processing.json  # E-commerce system example
+│   └── README.md                 # Examples documentation
 ├── scripts/                      # Utility scripts
 │   └── healthcheck.js            # App health verification
 ├── implementation-phase*.md      # Step-by-step guides
@@ -298,6 +321,119 @@ npm run healthcheck [port]
 ### Adding New Features
 
 See `plan.md` for the complete implementation roadmap organized by phases.
+
+---
+
+## 🧪 Testing
+
+DiagramFlow includes comprehensive testing documentation and tools.
+
+### Testing Documentation
+
+- **[TESTING.md](TESTING.md)** - Complete testing guide with checklists for:
+  - Cross-browser testing (Chrome, Firefox, Safari, Edge)
+  - Mobile/tablet responsive testing
+  - End-to-end feature testing
+  - Performance testing (Lighthouse)
+  - Accessibility testing (WCAG 2.1 AA)
+  - Bug reporting procedures
+
+### Running Tests
+
+```bash
+# Build production bundle
+npm run build
+
+# Test production build locally
+npm run preview
+
+# Run manual tests (see TESTING.md)
+# - Open http://localhost:4173
+# - Follow test checklists
+```
+
+### Performance Testing
+
+Run Lighthouse audit:
+1. Open app in Chrome
+2. Open DevTools (F12)
+3. Go to "Lighthouse" tab
+4. Run audit
+
+**Target Scores**: ≥ 90 for Performance, Accessibility, Best Practices, SEO
+
+### Accessibility Testing
+
+- Keyboard navigation (Tab, Enter, Escape, Arrow keys)
+- Screen reader compatibility (NVDA, VoiceOver, JAWS)
+- Color contrast ≥ 4.5:1
+- ARIA labels and semantic HTML
+- Focus management
+
+See [TESTING.md](TESTING.md) for detailed accessibility checklist.
+
+---
+
+## 🚀 Deployment
+
+DiagramFlow is deployed automatically to GitHub Pages.
+
+### Live Application
+
+**URL**: https://LefterisXris.github.io/diagram-flow/
+
+### Deployment Process
+
+Pushing to `main` branch triggers automatic deployment:
+
+```bash
+git push origin main
+```
+
+The GitHub Actions workflow:
+1. Builds the application
+2. Optimizes assets
+3. Deploys to GitHub Pages
+
+### Manual Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for:
+- Local build and preview
+- Manual GitHub Pages deployment
+- Alternative hosting (Netlify, Vercel)
+- Custom domain configuration
+- Troubleshooting guide
+
+---
+
+## 📋 Documentation
+
+- **[User Guide](public/docs/user-guide.md)** - Complete end-user documentation
+- **[Testing Guide](TESTING.md)** - Testing procedures and checklists
+- **[Deployment Guide](DEPLOYMENT.md)** - Deployment instructions
+- **[Architecture Doc](architect.md)** - Requirements and design decisions
+- **[Implementation Plan](plan.md)** - Phase-by-phase development plan
+- **[Task Tracker](tasks.md)** - Detailed task breakdown and progress
+
+---
+
+## 🐛 Bug Reports & Feature Requests
+
+### Reporting Issues
+
+Use GitHub Issues with the appropriate template:
+- **[Bug Report](.github/ISSUE_TEMPLATE/bug_report.md)** - Report bugs or issues
+- **[Feature Request](.github/ISSUE_TEMPLATE/feature_request.md)** - Suggest enhancements
+- **[Question](.github/ISSUE_TEMPLATE/question.md)** - Ask questions
+
+### Issue Labels
+
+- `bug` - Something isn't working
+- `enhancement` - New feature or request
+- `question` - Further information is requested
+- `documentation` - Documentation improvements
+- `accessibility` - Accessibility improvements
+- `performance` - Performance optimizations
 
 ---
 
@@ -487,7 +623,39 @@ MIT License - feel free to use this project for personal or commercial purposes.
 
 ## 🤝 Contributing
 
-This project is currently in active development. Contributions, issues, and feature requests are welcome!
+Contributions, issues, and feature requests are welcome!
+
+### How to Contribute
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Test thoroughly** (see [TESTING.md](TESTING.md))
+5. **Commit your changes**: `git commit -m 'Add amazing feature'`
+6. **Push to branch**: `git push origin feature/amazing-feature`
+7. **Open a Pull Request** using the [PR template](.github/pull_request_template.md)
+
+### Development Guidelines
+
+- Follow existing code style
+- Add comments for complex logic
+- Test on multiple browsers
+- Ensure accessibility
+- Update documentation
+- Run `npm run lint` before committing
+- Verify production build: `npm run build && npm run preview`
+
+### Testing Requirements
+
+Before submitting a PR:
+- [ ] Code builds without errors
+- [ ] Tested in Chrome, Firefox, Safari, or Edge
+- [ ] No console errors or warnings
+- [ ] Accessibility tested (keyboard navigation)
+- [ ] Responsive design verified
+- [ ] Documentation updated (if applicable)
+
+See [TESTING.md](TESTING.md) for detailed testing procedures.
 
 ---
 

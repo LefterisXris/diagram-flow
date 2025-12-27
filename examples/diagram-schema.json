@@ -1,0 +1,308 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://diagramflow.dev/schemas/diagram-v1.0.0.json",
+  "title": "DiagramFlow Diagram Schema",
+  "description": "JSON schema for DiagramFlow diagram files",
+  "type": "object",
+  "required": ["version", "metadata", "nodes", "edges"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0"]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Diagram metadata",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique diagram identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Diagram name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Diagram description"
+        },
+        "author": {
+          "type": "string",
+          "description": "Diagram author"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp (ISO 8601)"
+        },
+        "lastModified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification timestamp (ISO 8601)"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Diagram tags"
+        },
+        "version": {
+          "type": "string",
+          "description": "Diagram version"
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Array of nodes in the diagram",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type", "position"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique node identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Node display name (shown as label)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["service", "database", "client", "decision", "generic"],
+            "description": "Node type"
+          },
+          "position": {
+            "type": "object",
+            "required": ["x", "y"],
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "X coordinate"
+              },
+              "y": {
+                "type": "number",
+                "description": "Y coordinate"
+              }
+            }
+          },
+          "icon": {
+            "type": "string",
+            "description": "Lucide icon name",
+            "examples": ["Server", "Database", "Globe", "GitBranch", "Box"]
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Brief description (1-2 sentences)"
+          },
+          "detailedDescription": {
+            "type": "string",
+            "description": "Detailed description (supports Markdown)"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Node metadata",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["planned", "in-progress", "deployed", "deprecated"],
+                "description": "Node status",
+                "default": "planned"
+              },
+              "owner": {
+                "type": "string",
+                "description": "Team or person responsible"
+              },
+              "version": {
+                "type": "string",
+                "description": "Component version"
+              },
+              "criticality": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"],
+                "description": "System criticality",
+                "default": "medium"
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Node tags"
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["url", "label"],
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "label": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "description": "External links (docs, repos, dashboards)"
+              },
+              "dateAdded": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When node was added (ISO 8601)"
+              },
+              "dateModified": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Last modification date (ISO 8601)"
+              },
+              "author": {
+                "type": "string",
+                "description": "Node creator"
+              }
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Array of edges connecting nodes",
+      "items": {
+        "type": "object",
+        "required": ["id", "source", "target"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique edge identifier"
+          },
+          "source": {
+            "type": "string",
+            "description": "Source node ID"
+          },
+          "target": {
+            "type": "string",
+            "description": "Target node ID"
+          },
+          "label": {
+            "type": "string",
+            "description": "Edge label"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["default", "straight", "step", "smoothstep", "simplebezier"],
+            "description": "Edge type",
+            "default": "default"
+          },
+          "animated": {
+            "type": "boolean",
+            "description": "Whether edge is animated",
+            "default": false
+          },
+          "style": {
+            "type": "object",
+            "description": "Custom CSS styles for the edge"
+          },
+          "data": {
+            "type": "object",
+            "description": "Edge data (conditions, metadata)",
+            "properties": {
+              "condition": {
+                "type": "string",
+                "description": "Conditional expression (e.g., 'user.age > 18')"
+              },
+              "conditionType": {
+                "type": "string",
+                "enum": ["true", "false", "default"],
+                "description": "Condition type"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Evaluation priority (lower = higher priority)"
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional edge metadata"
+          }
+        }
+      }
+    },
+    "exampleCases": {
+      "type": "array",
+      "description": "Example cases for simulation",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "input"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique case identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Case name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Case description"
+          },
+          "input": {
+            "type": "object",
+            "required": ["nodeId", "data"],
+            "properties": {
+              "nodeId": {
+                "type": "string",
+                "description": "Starting node ID"
+              },
+              "data": {
+                "type": "object",
+                "description": "Input data for simulation (key-value pairs)"
+              }
+            }
+          },
+          "expectedPath": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Expected node IDs in execution order (optional)"
+          }
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "description": "Layout and viewport settings",
+      "properties": {
+        "zoom": {
+          "type": "number",
+          "description": "Zoom level",
+          "minimum": 0.1,
+          "maximum": 4,
+          "default": 1.0
+        },
+        "center": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "Viewport center X"
+            },
+            "y": {
+              "type": "number",
+              "description": "Viewport center Y"
+            }
+          }
+        }
+      }
+    }
+  }
+}

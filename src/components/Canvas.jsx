@@ -86,6 +86,10 @@ const Canvas = ({
         onNodeMouseLeave={onNodeMouseLeave}
         nodeTypes={memoizedNodeTypes}
         fitView
+        onlyRenderVisibleElements={true}
+        elevateNodesOnSelect={true}
+        minZoom={0.1}
+        maxZoom={4}
         style={{ backgroundColor: "var(--bg-primary)" }}
       >
         <Background color="var(--border-primary)" gap={20} />

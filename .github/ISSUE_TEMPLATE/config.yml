@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/LefterisXris/diagram-flow/blob/main/public/docs/user-guide.md
+    about: Read the user guide for help with using DiagramFlow
+  - name: 💬 Discussions
+    url: https://github.com/LefterisXris/diagram-flow/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🚀 Try DiagramFlow
+    url: https://LefterisXris.github.io/diagram-flow/
+    about: Try the live application
