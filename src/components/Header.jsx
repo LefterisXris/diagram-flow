@@ -1,7 +1,23 @@
-import { Layout } from "lucide-react";
+import { Layout, Download, Upload } from "lucide-react";
+import { useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
 
-const Header = () => {
+const Header = ({ onExport, onImport }) => {
+  const fileInputRef = useRef(null);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file && onImport) {
+      onImport(file);
+      // Reset input so same file can be imported again
+      event.target.value = "";
+    }
+  };
+
   return (
     <header
       className="border-b backdrop-blur-md sticky top-0 z-50"
@@ -22,6 +38,43 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          {onImport && (
+            <>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept=".json"
+                style={{ display: "none" }}
+              />
+              <button
+                onClick={handleImportClick}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                style={{
+                  backgroundColor: "var(--accent-green)",
+                  color: "#ffffff",
+                }}
+                title="Import diagram from JSON"
+              >
+                <Upload className="w-4 h-4" />
+                Import JSON
+              </button>
+            </>
+          )}
+          {onExport && (
+            <button
+              onClick={onExport}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+              style={{
+                backgroundColor: "var(--accent-blue)",
+                color: "#ffffff",
+              }}
+              title="Export diagram as JSON"
+            >
+              <Download className="w-4 h-4" />
+              Export JSON
+            </button>
+          )}
           <ThemeToggle />
         </div>
       </div>

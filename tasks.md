@@ -18,7 +18,7 @@
 Phase 0: Foundation & Setup                    [✓] ✅ Done (7/7 tasks)
 Phase 1: Basic Node & Edge Management          [✓] ✅ Done (6/6 tasks)
 Phase 2: Node Types & Rich Metadata            [✓] ✅ Done (5/5 tasks)
-Phase 3: State Persistence & File Management   [ ] ⬜ Not Started
+Phase 3: State Persistence & File Management   [~] 🔄 In Progress (2/6 tasks)
 Phase 4: Conditional Nodes & Branching Logic   [ ] ⬜ Not Started
 Phase 5: Example Cases & Flow Simulation       [ ] ⬜ Not Started
 Phase 6: Advanced Simulation Features          [ ] ⬜ Not Started
@@ -324,27 +324,27 @@ Phase 2 Steps 4-5 Completion Notes (2024-12-27):
 ---
 
 ## Phase 3: State Persistence & File Management
-**Status**: ⬜ Not Started
+**Status**: 🔄 In Progress
 **Duration**: 5-7 days
-**Started**: _____
+**Started**: 2024-12-27
 **Completed**: _____
 **Deliverable**: Full save/load functionality, export/import JSON files, session management
 
 ### Tasks
-- [ ] **Implement JSON Export**
-  - [ ] Create `exportDiagram()` function
-  - [ ] Format diagram as JSON with metadata
-  - [ ] Include nodes, edges, and layout (zoom, center)
-  - [ ] Download as `.json` file using Blob API
-  - [ ] Add "Export → JSON" button in header
+- [x] **Implement JSON Export** ✅ COMPLETED
+  - [x] Create `exportDiagram()` function
+  - [x] Format diagram as JSON with metadata
+  - [x] Include nodes, edges, and layout (zoom, center)
+  - [x] Download as `.json` file using Blob API
+  - [x] Add "Export → JSON" button in header
 
-- [ ] **Implement JSON Import**
-  - [ ] Create file input or drag-and-drop zone
-  - [ ] Parse JSON file
-  - [ ] Validate structure (version, required fields)
-  - [ ] Load nodes and edges into React Flow
-  - [ ] Restore zoom and pan position
-  - [ ] Add "Import → JSON" button in header
+- [x] **Implement JSON Import** ✅ COMPLETED
+  - [x] Create file input or drag-and-drop zone
+  - [x] Parse JSON file
+  - [x] Validate structure (version, required fields)
+  - [x] Load nodes and edges into React Flow
+  - [x] Restore zoom and pan position
+  - [x] Add "Import → JSON" button in header
 
 - [ ] **Session Management with Cookies**
   - [ ] Install `js-cookie` package
@@ -396,7 +396,57 @@ Phase 2 Steps 4-5 Completion Notes (2024-12-27):
 
 ### Notes
 ```
-[Add notes, blockers, or observations here]
+Phase 3 Step 1 Completion Notes (2024-12-27):
+- Created exportDiagram utility function (src/utils/exportDiagram.js):
+  * Formats diagram data according to architect.md Section 7.1 structure
+  * Includes version, metadata, nodes, edges, layout, canvasState
+  * Auto-calculates diagram created/modified dates from node metadata
+  * Maps all node properties to export format
+  * Includes viewport (zoom, center position)
+  * Downloads as .json file with timestamp
+- Updated Header component:
+  * Added "Export JSON" button with Download icon
+  * Professional styling with accent-blue background
+  * Tooltip for accessibility
+- Refactored App.jsx structure:
+  * Created DiagramContent wrapper component
+  * Moved Header inside ReactFlowProvider context
+  * Uses useReactFlow().getViewport() to capture canvas state
+  * Handles export with feedback to console
+- Export file format:
+  * JSON structure with 2-space indentation
+  * Filename: "diagramflow-{timestamp}.json"
+  * All node metadata preserved (dates, status, tags, links, etc.)
+  * Ready for import implementation (Step 2)
+
+Phase 3 Step 2 Completion Notes (2024-12-27):
+- Created importDiagram utility function (src/utils/importDiagram.js):
+  * Comprehensive JSON validation with detailed error messages
+  * Validates file type (.json extension)
+  * Validates JSON structure (version, metadata, nodes, edges)
+  * Validates node structure (id, name, type, position with x/y)
+  * Validates edge structure (id, source, target)
+  * Converts imported data to React Flow format
+  * Preserves all node metadata (status, owner, tags, links, etc.)
+  * Returns viewport state (zoom, x, y) for restoration
+  * Graceful error handling with user-friendly messages
+- Updated Header component:
+  * Added "Import JSON" button with Upload icon
+  * Hidden file input with accept=".json"
+  * File input ref for programmatic triggering
+  * Input reset after import (allows re-importing same file)
+  * Professional styling with accent-green background
+  * Positioned before Export button for logical workflow
+- Updated App.jsx for import functionality:
+  * Added importDiagram import
+  * Exposed setNodes from useDiagramState
+  * Created handleImport function in DiagramContent
+  * Uses setViewport() to restore canvas zoom/pan
+  * Success/error feedback via console and alert
+  * Full async/await error handling
+  * Passes onImport callback to Header
+- Dev server tested and confirmed working (port 5174)
+- Complete round-trip export/import functionality implemented
 ```
 
 ---
