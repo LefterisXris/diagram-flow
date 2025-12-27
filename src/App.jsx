@@ -88,6 +88,10 @@ function DiagramContent({
   validationResult,
   onValidationWarningClick,
   reactFlowWrapperRef,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }) {
   const { getViewport, setViewport, fitView } = useReactFlow();
   const reactFlowWrapper = useRef(null);
@@ -194,8 +198,8 @@ function DiagramContent({
         onOpenHelp={onOpenHelp}
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
+        onUndo={onUndo}
+        onRedo={onRedo}
         canUndo={canUndo}
         canRedo={canRedo}
       />
@@ -861,6 +865,10 @@ function App() {
           onStartTutorial={handleStartTutorial}
           onOpenHelp={handleOpenHelp}
           reactFlowWrapperRef={reactFlowWrapperRef}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
       </ReactFlowProvider>
 
