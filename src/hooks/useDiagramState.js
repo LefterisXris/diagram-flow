@@ -34,12 +34,15 @@ export const useDiagramState = () => {
     return () => clearTimeout(timer);
   }, [nodes, edges]);
 
-  const addNode = useCallback((position) => {
+  const addNode = useCallback((position, type = "generic", icon = null) => {
     const newNode = {
       id: crypto.randomUUID(),
-      type: "generic",
+      type,
       position,
-      data: { label: "New Node" },
+      data: {
+        label: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+        ...(icon && { icon }),
+      },
     };
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes]);

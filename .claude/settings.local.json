@@ -6,7 +6,8 @@
       "Bash(npm install:*)",
       "Bash(npm run healthcheck:*)",
       "Bash(dir:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(git add:*)"
     ]
   }
 }

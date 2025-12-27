@@ -16,8 +16,8 @@
 
 ```
 Phase 0: Foundation & Setup                    [✓] ✅ Done (7/7 tasks)
-Phase 1: Basic Node & Edge Management          [ ] ⬜ Not Started
-Phase 2: Node Types & Rich Metadata            [ ] ⬜ Not Started
+Phase 1: Basic Node & Edge Management          [✓] ✅ Done (6/6 tasks)
+Phase 2: Node Types & Rich Metadata            [~] 🔄 In Progress (2/5 tasks)
 Phase 3: State Persistence & File Management   [ ] ⬜ Not Started
 Phase 4: Conditional Nodes & Branching Logic   [ ] ⬜ Not Started
 Phase 5: Example Cases & Flow Simulation       [ ] ⬜ Not Started
@@ -29,7 +29,7 @@ Phase 9: Documentation & Deployment            [ ] ⬜ Not Started
 
 **Legend**: ⬜ Not Started | 🔄 In Progress | ✅ Done | ⚠️ Blocked
 
-**Overall Completion**: 1/10 phases complete (10%)
+**Overall Completion**: 2/10 phases complete (20%)
 
 ---
 
@@ -97,10 +97,10 @@ Phase 9: Documentation & Deployment            [ ] ⬜ Not Started
 ---
 
 ## Phase 1: Basic Node & Edge Management
-**Status**: ⬜ Not Started
+**Status**: ✅ Done
 **Duration**: 5-7 days
-**Started**: _____
-**Completed**: _____
+**Started**: 2024-12-27
+**Completed**: 2024-12-27
 **Deliverable**: Can create nodes, connect them, drag them around, and save to localStorage
 
 ### Tasks
@@ -179,29 +179,29 @@ Phase 1 Step 6 Completion Notes:
 ---
 
 ## Phase 2: Node Types & Rich Metadata
-**Status**: ⬜ Not Started
+**Status**: 🔄 In Progress
 **Duration**: 6-8 days
-**Started**: _____
+**Started**: 2024-12-27
 **Completed**: _____
 **Deliverable**: Professional diagrams with different node types, icons, and metadata panels
 
 ### Tasks
-- [ ] **Implement Multiple Node Types**
-  - [ ] Create `ServiceNode.jsx` (rectangle with server icon)
-  - [ ] Create `DatabaseNode.jsx` (cylinder shape with database icon)
-  - [ ] Create `ClientNode.jsx` (monitor/phone icon)
-  - [ ] Create `DecisionNode.jsx` (diamond shape)
-  - [ ] Create `GenericNode.jsx` (simple rectangle)
-  - [ ] Register node types in React Flow (`nodeTypes` object)
-  - [ ] Color-code by type
-  - [ ] Add type selector when creating node
+- [x] **Implement Multiple Node Types** ✅ COMPLETED
+  - [x] Create `ServiceNode.jsx` (rectangle with server icon)
+  - [x] Create `DatabaseNode.jsx` (rectangle with database icon)
+  - [x] Create `ClientNode.jsx` (monitor/phone icon)
+  - [x] Create `DecisionNode.jsx` (diamond shape)
+  - [x] Create `GenericNode.jsx` (simple rectangle)
+  - [x] Register node types in React Flow (`nodeTypes` object)
+  - [x] Color-code by type
+  - [x] Add type selector when creating node
 
-- [ ] **Add Icon Support**
-  - [ ] Integrate Lucide React icons
-  - [ ] Create icon picker component with search
-  - [ ] Store icon name in node data: `data.icon`
-  - [ ] Display icon in node header
-  - [ ] Add fallback to default icon
+- [x] **Add Icon Support** ✅ COMPLETED
+  - [x] Integrate Lucide React icons
+  - [x] Create icon picker component with search
+  - [x] Store icon name in node data: `data.icon`
+  - [x] Display icon in node header
+  - [x] Add fallback to default icon
 
 - [ ] **Implement Node Metadata Structure**
   - [ ] Extend node data model with full metadata
@@ -226,14 +226,46 @@ Phase 1 Step 6 Completion Notes:
   - [ ] Auto-save changes to state
 
 ### Demo Checklist
-- [ ] Create diagram with 5 different node types
+- [x] Create diagram with 5 different node types
 - [ ] Add rich metadata to nodes
 - [ ] Show detail panel with all properties
 - [ ] Demonstrate professional styling
 
 ### Notes
 ```
-[Add notes, blockers, or observations here]
+Phase 2 Step 1 Completion Notes (2024-12-27):
+- Created 5 node type components with distinct styling:
+  * GenericNode.jsx - Blue rectangular node with Box icon
+  * ServiceNode.jsx - Blue rectangular node with Server icon
+  * DatabaseNode.jsx - Green rectangular node with Database icon
+  * ClientNode.jsx - Purple rectangular node with Monitor icon
+  * DecisionNode.jsx - Orange diamond-shaped node with GitBranch icon
+- Updated nodeTypes.js to register all node types
+- Enhanced Sidebar with visual node type selector (2x grid layout)
+- Updated useDiagramState hook to accept node type parameter
+- All nodes have 4 connection handles (top, bottom, left, right)
+- Each node type has distinct color scheme and glow effect when selected
+- Type selector shows preview with icon and color for each node type
+
+Phase 2 Step 2 Completion Notes (2024-12-27):
+- Created IconPicker component with search functionality:
+  * Curated list of 100+ commonly used Lucide icons
+  * Real-time search/filter by icon name
+  * Grid display with visual preview
+  * Shows selected icon with highlight
+  * Icon count display
+- Updated all node components to use dynamic icons:
+  * Nodes check data.icon and dynamically load from Lucide React
+  * Fallback to default icon if data.icon not set or invalid
+  * GenericNode → Box, ServiceNode → Server, DatabaseNode → Database, etc.
+- Enhanced Sidebar with custom icon selector:
+  * Optional icon selection before creating node
+  * Visual preview of selected icon
+  * Clear button to reset to default
+  * Icon picker opens inline below selector
+- Updated useDiagramState hook to accept icon parameter
+- Icons stored in node data as data.icon (string icon name)
+- Fully functional icon customization for all node types
 ```
 
 ---
@@ -694,4 +726,4 @@ _When a phase is complete, move it here for easy reference_
 ---
 
 **Last Updated**: 2024-12-27
-**Next Action**: Begin Phase 1 - Basic Node & Edge Management
+**Next Action**: Continue Phase 2 - Implement Icon Support and Node Metadata
