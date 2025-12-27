@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Canvas from "./components/Canvas";
 import NodeDetailPanel from "./components/NodeDetailPanel";
+import EdgeConditionPanel from "./components/EdgeConditionPanel";
 import SaveDiagramDialog from "./components/SaveDiagramDialog";
 import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
@@ -14,7 +15,32 @@ import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
 
 // Wrapper component to access ReactFlow context
-function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, onNodeClick, setEdges, setNodes, selectedNode, handleClosePanel, updateNode, onExport, onSave, onOpen, onImportMermaid, isDirty, lastSaved, triggerAutoSave }) {
+function DiagramContent({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  addNode,
+  onNodeClick,
+  onEdgeClick,
+  onPaneClick,
+  setEdges,
+  setNodes,
+  selectedNode,
+  selectedEdge,
+  selectedEdgeSource,
+  handleClosePanel,
+  handleCloseEdgePanel,
+  updateNode,
+  updateEdge,
+  onExport,
+  onSave,
+  onOpen,
+  onImportMermaid,
+  isDirty,
+  lastSaved,
+  triggerAutoSave,
+}) {
   const { getViewport, setViewport } = useReactFlow();
 
   const handleExport = () => {
@@ -79,6 +105,8 @@ function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, o
           onEdgesChange={onEdgesChange}
           onAddNode={addNode}
           onNodeClick={onNodeClick}
+          onEdgeClick={onEdgeClick}
+          onPaneClick={onPaneClick}
           setEdges={setEdges}
         />
         {selectedNode && (
@@ -88,6 +116,12 @@ function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, o
             onUpdate={updateNode}
           />
         )}
+        <EdgeConditionPanel
+          edge={selectedEdge}
+          sourceNode={selectedEdgeSource}
+          onClose={handleCloseEdgePanel}
+          onUpdateEdge={updateEdge}
+        />
       </div>
     </>
   );
@@ -119,6 +153,7 @@ function App() {
   } = useDiagramState();
 
   const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null);
   const [currentDiagramId, setCurrentDiagramId] = useState(null);
   const [currentDiagramName, setCurrentDiagramName] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -149,11 +184,37 @@ function App() {
 
   const handleNodeClick = (event, node) => {
     setSelectedNode(node);
+    setSelectedEdgeId(null);
   };
 
   const handleClosePanel = () => {
     setSelectedNode(null);
   };
+
+  const handleEdgeClick = (event, edge) => {
+    setSelectedNode(null);
+    setSelectedEdgeId(edge.id);
+  };
+
+  const handleCloseEdgePanel = () => {
+    setSelectedEdgeId(null);
+  };
+
+  const handlePaneClick = () => {
+    setSelectedNode(null);
+    setSelectedEdgeId(null);
+  };
+
+  const updateEdge = (edgeId, updater) => {
+    setEdges((eds) => eds.map((edge) => (edge.id === edgeId ? updater(edge) : edge)));
+  };
+
+  const selectedEdge = selectedEdgeId
+    ? edges.find((edge) => edge.id === selectedEdgeId)
+    : null;
+  const selectedEdgeSource = selectedEdge
+    ? nodes.find((node) => node.id === selectedEdge.source)
+    : null;
 
   const handleExportComplete = () => {
     // Optional: Show toast notification or feedback
@@ -231,11 +292,17 @@ function App() {
           onEdgesChange={onEdgesChange}
           addNode={addNode}
           onNodeClick={handleNodeClick}
+          onEdgeClick={handleEdgeClick}
+          onPaneClick={handlePaneClick}
           setEdges={setEdges}
           setNodes={setNodes}
           selectedNode={selectedNode}
+          selectedEdge={selectedEdge}
+          selectedEdgeSource={selectedEdgeSource}
           handleClosePanel={handleClosePanel}
+          handleCloseEdgePanel={handleCloseEdgePanel}
           updateNode={updateNode}
+          updateEdge={updateEdge}
           onExport={handleExportComplete}
           onSave={handleSaveClick}
           onOpen={handleOpenClick}

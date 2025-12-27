@@ -3,6 +3,8 @@
  * Parses Mermaid flowchart syntax and converts to DiagramFlow format
  */
 
+import { createConditionalEdgeData } from "./edgeConditions";
+
 /**
  * Parse Mermaid code and convert to DiagramFlow nodes and edges
  * @param {string} mermaidCode - Mermaid flowchart code
@@ -59,6 +61,7 @@ export function parseMermaid(mermaidCode) {
         animated: style.animated,
         type: 'smoothstep',
         style: style.edgeStyle,
+        data: createConditionalEdgeData(),
       });
       continue;
     }

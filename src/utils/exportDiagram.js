@@ -3,6 +3,8 @@
  * Follows the structure defined in architect.md Section 7.1
  */
 
+import { createConditionalEdgeData } from "./edgeConditions";
+
 export const exportDiagram = (nodes, edges, viewport, diagramName = "diagram") => {
   // Get current timestamp
   const now = new Date().toISOString();
@@ -48,7 +50,13 @@ export const exportDiagram = (nodes, edges, viewport, diagramName = "diagram") =
         criticality: node.data.metadata?.criticality || "medium",
       },
     })),
-    edges: edges.map(edge => ({
+    edges: edges.map(edge => {
+      const edgeData = createConditionalEdgeData({
+        ...edge.data,
+        label: edge.data?.label || edge.label || "",
+      });
+
+      return {
       id: edge.id,
       source: edge.source,
       target: edge.target,
@@ -56,8 +64,10 @@ export const exportDiagram = (nodes, edges, viewport, diagramName = "diagram") =
       animated: edge.animated || false,
       type: edge.type || "default",
       style: edge.style || {},
+      data: edgeData,
       metadata: edge.metadata || {},
-    })),
+      };
+    }),
     exampleCases: [],
     layout: {
       zoom: viewport?.zoom || 1.0,

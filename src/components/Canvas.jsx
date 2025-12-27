@@ -2,8 +2,19 @@ import { useCallback, useMemo } from "react";
 import ReactFlow, { Background, Controls, addEdge, useReactFlow } from "reactflow";
 import "reactflow/dist/style.css";
 import { nodeTypes } from "../config/nodeTypes";
+import { applyConditionalEdgeStyle, createConditionalEdgeData } from "../utils/edgeConditions";
 
-const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeClick, setEdges }) => {
+const Canvas = ({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onAddNode,
+  onNodeClick,
+  onEdgeClick,
+  onPaneClick,
+  setEdges,
+}) => {
   const { screenToFlowPosition } = useReactFlow();
 
   // Handle double-click to create node
@@ -18,14 +29,25 @@ const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeC
 
   // Handle edge creation
   const onConnect = useCallback((params) => {
+    const sourceNode = nodes.find((node) => node.id === params.source);
+    const isDecisionSource = sourceNode?.type === "decision";
+    const edgeData = createConditionalEdgeData({
+      conditionType: isDecisionSource ? "true" : "",
+    });
+    const conditionalStyle = isDecisionSource
+      ? applyConditionalEdgeStyle({}, edgeData.conditionType)
+      : null;
+
     const newEdge = {
       ...params,
       id: crypto.randomUUID(),
       animated: true,
       type: "smoothstep",
+      data: edgeData,
+      ...(conditionalStyle ? { style: conditionalStyle } : {}),
     };
     setEdges((eds) => addEdge(newEdge, eds));
-  }, [setEdges]);
+  }, [nodes, setEdges]);
 
   // Memoize nodeTypes to prevent recreation
   const memoizedNodeTypes = useMemo(() => nodeTypes, []);
@@ -47,6 +69,8 @@ const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeC
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
+        onPaneClick={onPaneClick}
         nodeTypes={memoizedNodeTypes}
         fitView
         style={{ backgroundColor: "var(--bg-primary)" }}
