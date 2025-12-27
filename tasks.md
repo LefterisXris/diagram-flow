@@ -18,7 +18,7 @@
 Phase 0: Foundation & Setup                    [✓] ✅ Done (7/7 tasks)
 Phase 1: Basic Node & Edge Management          [✓] ✅ Done (6/6 tasks)
 Phase 2: Node Types & Rich Metadata            [✓] ✅ Done (5/5 tasks)
-Phase 3: State Persistence & File Management   [~] 🔄 In Progress (2/6 tasks)
+Phase 3: State Persistence & File Management   [~] 🔄 In Progress (4/6 tasks)
 Phase 4: Conditional Nodes & Branching Logic   [ ] ⬜ Not Started
 Phase 5: Example Cases & Flow Simulation       [ ] ⬜ Not Started
 Phase 6: Advanced Simulation Features          [ ] ⬜ Not Started
@@ -346,21 +346,21 @@ Phase 2 Steps 4-5 Completion Notes (2024-12-27):
   - [x] Restore zoom and pan position
   - [x] Add "Import → JSON" button in header
 
-- [ ] **Session Management with Cookies**
-  - [ ] Install `js-cookie` package
-  - [ ] Create session on first load with UUID
-  - [ ] Set cookie: `diagram_session` (expires 7 days)
-  - [ ] Store session data in localStorage
-  - [ ] Track active diagram and preferences
+- [x] **Session Management with Cookies** ✅ COMPLETED
+  - [x] Install `js-cookie` package
+  - [x] Create session on first load with UUID
+  - [x] Set cookie: `diagram_session` (expires 7 days)
+  - [x] Store session data in localStorage
+  - [x] Track active diagram and preferences
 
-- [ ] **Implement "Save As" and Diagram Library**
-  - [ ] Save button: Save current diagram with name
-  - [ ] Store in localStorage: `diagram_<id>`
-  - [ ] Keep index: `diagram_list`
-  - [ ] Create "Open Diagram" modal
-  - [ ] List all saved diagrams with metadata
-  - [ ] Load diagram on click
-  - [ ] Add delete diagram option
+- [x] **Implement "Save As" and Diagram Library** ✅ COMPLETED
+  - [x] Save button: Save current diagram with name
+  - [x] Store in localStorage: `diagram_<id>`
+  - [x] Keep index: `diagram_list`
+  - [x] Create "Open Diagram" modal
+  - [x] List all saved diagrams with metadata
+  - [x] Load diagram on click
+  - [x] Add delete diagram option
 
 - [ ] **Auto-Save Improvements**
   - [ ] Save entire diagram state (nodes, edges, zoom, pan)
@@ -447,6 +447,100 @@ Phase 3 Step 2 Completion Notes (2024-12-27):
   * Passes onImport callback to Header
 - Dev server tested and confirmed working (port 5174)
 - Complete round-trip export/import functionality implemented
+
+Phase 3 Step 3 Completion Notes (2024-12-27):
+- Created session management hook (src/hooks/useSession.js):
+  * Automatically creates session on first load using crypto.randomUUID()
+  * Sets cookie 'diagram_session' with 7-day expiration via js-cookie
+  * Stores session data in localStorage with architect.md-compliant structure:
+    - session_<id>: Complete session metadata (sessionId, createdAt, lastAccess, activeDiagramId, recentDiagrams, preferences)
+    - session_<id>_activeDiagram: Current active diagram ID
+    - session_<id>_preferences: User preferences (theme, autoSaveInterval, defaultNodeType)
+  * Session metadata includes all required fields per architect.md Section 5.2:
+    - sessionId: UUID v4
+    - createdAt: ISO timestamp (auto-populated on creation)
+    - lastAccess: ISO timestamp (auto-updated on session restore)
+    - activeDiagramId: null initially, tracks current diagram
+    - recentDiagrams: Empty array initially, stores up to 10 recent diagrams
+    - preferences: Object with theme='dark', autoSaveInterval=30000, defaultNodeType='service'
+  * Provides utility functions:
+    - getSessionData(): Retrieve full session data
+    - updateSessionData(updates): Update session data and auto-update lastAccess
+    - setActiveDiagram(diagramId): Update active diagram ID
+    - updatePreferences(preferences): Update user preferences
+    - addRecentDiagram(diagram): Add to recent diagrams list (max 10)
+    - clearSession(): Clear all session data and cookie
+  * Restores existing sessions on return via cookie check
+  * Updates lastAccess timestamp on session restore
+- Integrated useSession hook into App.jsx:
+  * Session initialized automatically on app mount
+  * Session ID logged to console for verification
+  * Ready for integration with diagram library and preferences
+- Session cookie verified with correct expiration (7 days)
+- All localStorage keys follow architect.md naming conventions
+- Session management fully compliant with architect.md Section 5.2
+
+Phase 3 Step 4 Completion Notes (2024-12-27):
+- Created diagram library utility module (src/utils/diagramLibrary.js):
+  * saveDiagram(): Saves diagram to localStorage with key diagram_<id>
+  * loadDiagram(): Loads diagram from localStorage by ID
+  * deleteDiagram(): Removes diagram from localStorage
+  * listDiagrams(): Returns all saved diagrams sorted by lastModified (newest first)
+  * renameDiagram(): Renames existing diagram
+  * getDiagramMetadata(): Gets metadata without loading full diagram
+  * Maintains index in localStorage with key: diagram_list
+  * Diagram data structure includes: version, metadata (id, name, createdAt, lastModified), nodes, edges, viewport
+  * Metadata includes nodeCount and edgeCount for preview
+- Created SaveDiagramDialog component (src/components/SaveDiagramDialog.jsx):
+  * Modal dialog that prompts for diagram name
+  * Auto-focuses input field for quick entry
+  * Keyboard shortcuts: Enter to save, Escape to cancel
+  * Validates non-empty name before saving
+  * Pre-fills with current diagram name for updates
+  * Professional styling with theme colors
+- Created OpenDiagramDialog component (src/components/OpenDiagramDialog.jsx):
+  * Modal dialog showing list of all saved diagrams
+  * Displays diagram name, last modified date/time, and node/edge counts
+  * Click diagram to load it
+  * Delete button for each diagram with confirmation dialog
+  * Empty state with helpful message when no diagrams saved
+  * Sorted by last modified (newest first)
+  * Confirmation dialog for delete action prevents accidental deletion
+  * Auto-refreshes list after deletion
+- Updated Header component:
+  * Added "Save" button (primary action with blue background)
+  * Added "Open" button (secondary action with border)
+  * Restyled Import/Export as secondary actions for visual hierarchy
+  * All buttons have appropriate icons from Lucide React
+- Integrated into App.jsx:
+  * Added state for currentDiagramId, currentDiagramName, showSaveDialog, showOpenDialog
+  * handleSaveClick: Opens save dialog with viewport state
+  * handleSaveConfirm: Saves diagram, updates session activeDiagramId, adds to recent diagrams
+  * handleOpenClick: Opens diagram picker
+  * handleLoadDiagram: Loads diagram, updates nodes/edges, sets as active
+  * SaveDiagramDialog and OpenDiagramDialog rendered at app level
+  * Full integration with session management (setActiveDiagram, addRecentDiagram)
+- Save functionality:
+  * Prompts for name on first save
+  * Uses existing name for subsequent saves
+  * Generates UUID for new diagrams
+  * Updates existing diagram if ID already set
+  * Saves complete state: nodes, edges, viewport (zoom, x, y)
+  * Updates diagram_list index with metadata
+- Load functionality:
+  * Shows all saved diagrams in picker
+  * Displays last modified date and counts
+  * Restores nodes, edges, and diagram metadata
+  * Sets diagram as active in session
+- Delete functionality:
+  * Confirmation dialog prevents accidental deletion
+  * Removes from localStorage (diagram_<id> and diagram_list)
+  * Auto-refreshes diagram list after deletion
+- All localStorage keys follow architect.md conventions:
+  * diagram_<id>: Full diagram data
+  * diagram_list: Array of diagram metadata
+- Dev server tested and confirmed working (port 5175)
+- Complete diagram library functionality implemented and ready for use
 ```
 
 ---

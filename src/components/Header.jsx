@@ -1,8 +1,8 @@
-import { Layout, Download, Upload } from "lucide-react";
+import { Layout, Download, Upload, Save, FolderOpen } from "lucide-react";
 import { useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
 
-const Header = ({ onExport, onImport }) => {
+const Header = ({ onExport, onImport, onSave, onOpen }) => {
   const fileInputRef = useRef(null);
 
   const handleImportClick = () => {
@@ -38,6 +38,34 @@ const Header = ({ onExport, onImport }) => {
         </div>
 
         <div className="flex items-center gap-3">
+          {onSave && (
+            <button
+              onClick={onSave}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+              style={{
+                backgroundColor: "var(--accent-blue)",
+                color: "#ffffff",
+              }}
+              title="Save diagram"
+            >
+              <Save className="w-4 h-4" />
+              Save
+            </button>
+          )}
+          {onOpen && (
+            <button
+              onClick={onOpen}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium border"
+              style={{
+                borderColor: "var(--border-primary)",
+                color: "var(--text-primary)",
+              }}
+              title="Open saved diagram"
+            >
+              <FolderOpen className="w-4 h-4" />
+              Open
+            </button>
+          )}
           {onImport && (
             <>
               <input
@@ -49,30 +77,30 @@ const Header = ({ onExport, onImport }) => {
               />
               <button
                 onClick={handleImportClick}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium border"
                 style={{
-                  backgroundColor: "var(--accent-green)",
-                  color: "#ffffff",
+                  borderColor: "var(--border-primary)",
+                  color: "var(--text-primary)",
                 }}
                 title="Import diagram from JSON"
               >
                 <Upload className="w-4 h-4" />
-                Import JSON
+                Import
               </button>
             </>
           )}
           {onExport && (
             <button
               onClick={onExport}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium border"
               style={{
-                backgroundColor: "var(--accent-blue)",
-                color: "#ffffff",
+                borderColor: "var(--border-primary)",
+                color: "var(--text-primary)",
               }}
               title="Export diagram as JSON"
             >
               <Download className="w-4 h-4" />
-              Export JSON
+              Export
             </button>
           )}
           <ThemeToggle />

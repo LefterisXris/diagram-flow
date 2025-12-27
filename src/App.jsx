@@ -4,12 +4,16 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Canvas from "./components/Canvas";
 import NodeDetailPanel from "./components/NodeDetailPanel";
+import SaveDiagramDialog from "./components/SaveDiagramDialog";
+import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import { useDiagramState } from "./hooks/useDiagramState";
+import { useSession } from "./hooks/useSession";
 import { exportDiagram } from "./utils/exportDiagram";
 import { importDiagram } from "./utils/importDiagram";
+import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
 
 // Wrapper component to access ReactFlow context
-function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, onNodeClick, setEdges, setNodes, selectedNode, handleClosePanel, updateNode, onExport }) {
+function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, onNodeClick, setEdges, setNodes, selectedNode, handleClosePanel, updateNode, onExport, onSave, onOpen }) {
   const { getViewport, setViewport } = useReactFlow();
 
   const handleExport = () => {
@@ -39,9 +43,19 @@ function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, o
     }
   };
 
+  const handleSave = () => {
+    const viewport = getViewport();
+    onSave(viewport);
+  };
+
   return (
     <>
-      <Header onExport={handleExport} onImport={handleImport} />
+      <Header
+        onExport={handleExport}
+        onImport={handleImport}
+        onSave={handleSave}
+        onOpen={onOpen}
+      />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar onAddNode={addNode} />
         <Canvas
@@ -66,6 +80,15 @@ function DiagramContent({ nodes, edges, onNodesChange, onEdgesChange, addNode, o
 }
 
 function App() {
+  // Initialize session management
+  const {
+    sessionId,
+    isInitialized,
+    setActiveDiagram,
+    updatePreferences,
+    addRecentDiagram,
+  } = useSession();
+
   const {
     nodes,
     edges,
@@ -78,6 +101,16 @@ function App() {
   } = useDiagramState();
 
   const [selectedNode, setSelectedNode] = useState(null);
+  const [currentDiagramId, setCurrentDiagramId] = useState(null);
+  const [currentDiagramName, setCurrentDiagramName] = useState('');
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showOpenDialog, setShowOpenDialog] = useState(false);
+  const [pendingViewport, setPendingViewport] = useState(null);
+
+  // Log session initialization (for verification)
+  if (isInitialized && sessionId) {
+    console.log(`Session initialized: ${sessionId}`);
+  }
 
   const handleNodeClick = (event, node) => {
     setSelectedNode(node);
@@ -90,6 +123,48 @@ function App() {
   const handleExportComplete = () => {
     // Optional: Show toast notification or feedback
     console.log("Diagram exported successfully");
+  };
+
+  const handleSaveClick = (viewport) => {
+    setPendingViewport(viewport);
+    setShowSaveDialog(true);
+  };
+
+  const handleSaveConfirm = (name) => {
+    const metadata = saveDiagram({
+      id: currentDiagramId,
+      name,
+      nodes,
+      edges,
+      viewport: pendingViewport,
+    });
+
+    setCurrentDiagramId(metadata.id);
+    setCurrentDiagramName(metadata.name);
+    setActiveDiagram(metadata.id);
+    addRecentDiagram(metadata);
+
+    console.log(`Diagram saved: ${metadata.name} (${metadata.id})`);
+  };
+
+  const handleOpenClick = () => {
+    setShowOpenDialog(true);
+  };
+
+  const handleLoadDiagram = (diagramId) => {
+    const diagram = loadDiagram(diagramId);
+
+    if (diagram) {
+      setNodes(diagram.nodes);
+      setEdges(diagram.edges);
+      setCurrentDiagramId(diagram.metadata.id);
+      setCurrentDiagramName(diagram.metadata.name);
+      setActiveDiagram(diagram.metadata.id);
+
+      console.log(`Diagram loaded: ${diagram.metadata.name}`);
+    } else {
+      alert('Failed to load diagram');
+    }
   };
 
   return (
@@ -114,8 +189,25 @@ function App() {
           handleClosePanel={handleClosePanel}
           updateNode={updateNode}
           onExport={handleExportComplete}
+          onSave={handleSaveClick}
+          onOpen={handleOpenClick}
         />
       </ReactFlowProvider>
+
+      {/* Save Dialog */}
+      <SaveDiagramDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSaveConfirm}
+        currentName={currentDiagramName}
+      />
+
+      {/* Open Dialog */}
+      <OpenDiagramDialog
+        isOpen={showOpenDialog}
+        onClose={() => setShowOpenDialog(false)}
+        onLoad={handleLoadDiagram}
+      />
     </div>
   );
 }
