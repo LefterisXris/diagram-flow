@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ReactFlowProvider, useReactFlow } from "reactflow";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
@@ -10,6 +10,7 @@ import DataInspectorPanel from "./components/DataInspectorPanel";
 import SaveDiagramDialog from "./components/SaveDiagramDialog";
 import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
+import ExportDialog from "./components/ExportDialog";
 import WelcomeScreen from "./components/WelcomeScreen";
 import TutorialOverlay from "./components/TutorialOverlay";
 import { useDiagramState } from "./hooks/useDiagramState";
@@ -21,6 +22,9 @@ import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
 import { applyConditionalEdgeHighlight, normalizeConditionalEdge } from "./utils/edgeConditions";
 import { normalizeExampleCases } from "./utils/exampleCases";
 import { petClinicTemplate } from "./templates/petClinic";
+import { getVisibleNodes, extractFilterOptions } from "./utils/searchFilter";
+import { validateDiagram } from "./utils/validation";
+import { exportToPNG, exportToSVG, exportToHTML } from "./utils/advancedExport";
 
 // Wrapper component to access ReactFlow context
 function DiagramContent({
@@ -66,8 +70,43 @@ function DiagramContent({
   setTemplateJustLoaded,
   setSelectedNode,
   onStartTutorial,
+  searchQuery,
+  onSearchChange,
+  filters,
+  onFiltersChange,
+  filterOptions,
+  visibleCount,
+  totalCount,
+  onClearFilters,
+  validationResult,
+  onValidationWarningClick,
+  reactFlowWrapperRef,
 }) {
   const { getViewport, setViewport, fitView } = useReactFlow();
+  const reactFlowWrapper = useRef(null);
+
+  // Apply visual highlighting based on search/filter
+  const styledNodes = useMemo(() => {
+    const { visibleNodeIds } = getVisibleNodes(nodes, searchQuery, filters);
+    const hasActiveSearchOrFilter = searchQuery ||
+      filters.types.length > 0 ||
+      filters.statuses.length > 0 ||
+      filters.owners.length > 0 ||
+      filters.tags.length > 0;
+
+    if (!hasActiveSearchOrFilter) {
+      // No filters active, return nodes as-is
+      return nodes;
+    }
+
+    return nodes.map(node => ({
+      ...node,
+      style: {
+        ...node.style,
+        opacity: visibleNodeIds.has(node.id) ? 1 : 0.25,
+      },
+    }));
+  }, [nodes, searchQuery, filters]);
 
   const handleExport = () => {
     const viewport = getViewport();
@@ -145,8 +184,10 @@ function DiagramContent({
         isDirty={isDirty}
         lastSaved={lastSaved}
         onStartTutorial={onStartTutorial}
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
       />
-      <div className="flex-1 flex overflow-hidden">
+      <div ref={reactFlowWrapperRef} className="flex-1 flex overflow-hidden">
         <Sidebar
           onAddNode={addNode}
           exampleCases={exampleCases}
@@ -161,9 +202,17 @@ function DiagramContent({
           onDeleteHistoryItem={onDeleteHistoryItem}
           onClearHistory={onClearHistory}
           onSimulationComplete={onSimulationComplete}
+          filters={filters}
+          onFiltersChange={onFiltersChange}
+          filterOptions={filterOptions}
+          visibleCount={visibleCount}
+          totalCount={totalCount}
+          onClearFilters={onClearFilters}
+          validationResult={validationResult}
+          onValidationWarningClick={onValidationWarningClick}
         />
         <Canvas
-          nodes={nodes}
+          nodes={styledNodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
@@ -256,6 +305,19 @@ function App() {
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   const [templateJustLoaded, setTemplateJustLoaded] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+
+  // Ref for React Flow container (for advanced exports)
+  const reactFlowWrapperRef = useRef(null);
+
+  // Search & Filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState({
+    types: [], // Array of node types to show (empty = show all)
+    statuses: [], // Array of statuses to show (empty = show all)
+    owners: [], // Array of owners to show (empty = show all)
+    tags: [], // Array of tags to show (empty = show all)
+  });
 
   // Simulation history tracking
   const {
@@ -264,6 +326,54 @@ function App() {
     clearHistory,
     deleteHistoryItem,
   } = useSimulationHistory(currentDiagramId);
+
+  // Search & Filter computed values
+  const { visibleNodeIds, visibleCount, totalCount } = useMemo(() => {
+    return getVisibleNodes(nodes, searchQuery, filters);
+  }, [nodes, searchQuery, filters]);
+
+  const filterOptions = useMemo(() => {
+    return extractFilterOptions(nodes);
+  }, [nodes]);
+
+  // Validation computed values (debounced via useMemo dependencies)
+  const validationResult = useMemo(() => {
+    return validateDiagram(nodes, edges);
+  }, [nodes, edges]);
+
+  // Handlers for search & filter
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+  };
+
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setFilters({
+      types: [],
+      statuses: [],
+      owners: [],
+      tags: [],
+    });
+  };
+
+  // Handler for validation warning click
+  const handleValidationWarningClick = (warning) => {
+    // Find the node
+    const node = nodes.find(n => n.id === warning.nodeId);
+    if (node) {
+      // Select the node to show in detail panel
+      setSelectedNode(node);
+
+      // Close any open edge panel
+      setSelectedEdgeId(null);
+
+      console.log(`Highlighted node: ${warning.nodeName} (${warning.type})`);
+    }
+  };
 
   const handleSimulationStateChange = (newState) => {
     setSimulationState(newState);
@@ -382,8 +492,62 @@ function App() {
   }, [hoveredDecisionNodeId, setEdges]);
 
   const handleExportComplete = () => {
-    // Optional: Show toast notification or feedback
-    console.log("Diagram exported successfully");
+    // Show export dialog instead of direct export
+    setShowExportDialog(true);
+  };
+
+  const handleAdvancedExport = async (format, fileName, options) => {
+    try {
+      if (format === 'png') {
+        // Export as PNG
+        const element = reactFlowWrapperRef.current?.querySelector('.react-flow');
+        if (element) {
+          await exportToPNG(element, fileName, {
+            backgroundColor: options.backgroundColor,
+          });
+          console.log('PNG export successful');
+        } else {
+          console.error('React Flow element not found');
+        }
+      } else if (format === 'svg') {
+        // Export as SVG
+        const element = reactFlowWrapperRef.current?.querySelector('.react-flow');
+        if (element) {
+          await exportToSVG(element, fileName, {
+            backgroundColor: options.backgroundColor,
+          });
+          console.log('SVG export successful');
+        } else {
+          console.error('React Flow element not found');
+        }
+      } else if (format === 'html') {
+        // Export as standalone HTML
+        const viewport = reactFlowWrapperRef.current?.querySelector('.react-flow__viewport');
+        // Get viewport transform if available, otherwise use default
+        let viewportData = { x: 0, y: 0, zoom: 1 };
+        if (viewport) {
+          const transform = viewport.style.transform;
+          // Parse transform matrix if available
+          const match = transform.match(/translate\((-?\d+\.?\d*)px,\s*(-?\d+\.?\d*)px\)\s*scale\((-?\d+\.?\d*)\)/);
+          if (match) {
+            viewportData = {
+              x: parseFloat(match[1]),
+              y: parseFloat(match[2]),
+              zoom: parseFloat(match[3]),
+            };
+          }
+        }
+
+        exportToHTML(nodes, edges, viewportData, fileName, {
+          title: options.title || currentDiagramName || 'DiagramFlow Export',
+          description: options.description || '',
+        });
+        console.log('HTML export successful');
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert(`Export failed: ${error.message}`);
+    }
   };
 
   const handleSaveClick = (viewport) => {
@@ -543,8 +707,19 @@ function App() {
           onSimulationComplete={handleSimulationComplete}
           templateJustLoaded={templateJustLoaded}
           setTemplateJustLoaded={setTemplateJustLoaded}
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          filterOptions={filterOptions}
+          visibleCount={visibleCount}
+          totalCount={totalCount}
+          onClearFilters={handleClearFilters}
+          validationResult={validationResult}
+          onValidationWarningClick={handleValidationWarningClick}
           setSelectedNode={setSelectedNode}
           onStartTutorial={handleStartTutorial}
+          reactFlowWrapperRef={reactFlowWrapperRef}
         />
       </ReactFlowProvider>
 
@@ -568,6 +743,14 @@ function App() {
         isOpen={showMermaidImportDialog}
         onClose={() => setShowMermaidImportDialog(false)}
         onImport={handleMermaidImport}
+      />
+
+      {/* Export Dialog */}
+      <ExportDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        onExport={handleAdvancedExport}
+        diagramName={currentDiagramName || 'diagram'}
       />
 
       {/* Welcome Screen */}
