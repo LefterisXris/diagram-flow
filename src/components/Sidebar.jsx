@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Plus, Box, Server, Database, Monitor, GitBranch, Wrench, FlaskConical, Play, History } from "lucide-react";
+import { Plus, Box, Server, Database, Monitor, GitBranch, Wrench, FlaskConical, Play, History, Filter, AlertCircle } from "lucide-react";
 import * as Icons from "lucide-react";
 import IconPicker from "./IconPicker";
 import ExampleCasesList from "./ExampleCasesList";
 import ExampleCaseForm from "./ExampleCaseForm";
 import SimulationPanel from "./SimulationPanel";
 import SimulationHistory from "./SimulationHistory";
+import FilterPanel from "./FilterPanel";
+import ValidationPanel from "./ValidationPanel";
 
 const nodeTypeOptions = [
   { type: "generic", label: "Generic", icon: Box, color: "#3b82f6" },
@@ -17,6 +19,8 @@ const nodeTypeOptions = [
 
 const tabs = [
   { id: "tools", label: "Tools", icon: Wrench },
+  { id: "filters", label: "Filters", icon: Filter },
+  { id: "validation", label: "Validation", icon: AlertCircle },
   { id: "cases", label: "Example Cases", icon: FlaskConical },
   { id: "history", label: "History", icon: History },
 ];
@@ -35,6 +39,14 @@ const Sidebar = ({
   onDeleteHistoryItem,
   onClearHistory,
   onSimulationComplete,
+  filters,
+  onFiltersChange,
+  filterOptions,
+  visibleCount,
+  totalCount,
+  onClearFilters,
+  validationResult,
+  onValidationWarningClick,
 }) => {
   const [activeTab, setActiveTab] = useState("tools");
   const [selectedType, setSelectedType] = useState("generic");
@@ -229,6 +241,24 @@ const Sidebar = ({
                 Add Node
               </button>
             </div>
+          )}
+
+          {activeTab === "filters" && (
+            <FilterPanel
+              filters={filters}
+              onFiltersChange={onFiltersChange}
+              filterOptions={filterOptions}
+              visibleCount={visibleCount}
+              totalCount={totalCount}
+              onClearFilters={onClearFilters}
+            />
+          )}
+
+          {activeTab === "validation" && (
+            <ValidationPanel
+              validationResult={validationResult}
+              onWarningClick={onValidationWarningClick}
+            />
           )}
 
           {activeTab === "cases" && (
