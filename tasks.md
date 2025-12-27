@@ -8,7 +8,7 @@
 
 **Project Start Date**: 2024-12-26
 **Target Completion**: ~12-16 weeks
-**Current Phase**: Phase 6 In Progress (Step 1/5 Complete)
+**Current Phase**: Phase 6 In Progress (Step 1 & 3 Complete, 2/5 tasks done)
 
 ---
 
@@ -21,7 +21,7 @@ Phase 2: Node Types & Rich Metadata            [✓] ✅ Done (5/5 tasks)
 Phase 3: State Persistence & File Management   [✓] ✅ Done (6/6 tasks)
 Phase 4: Conditional Nodes & Branching Logic   [✓] ✅ Done (3/3 tasks)
 Phase 5: Example Cases & Flow Simulation       [✓] ✅ Done (5/5 tasks)
-Phase 6: Advanced Simulation Features          [~] 🔄 In Progress (1/5 tasks)
+Phase 6: Advanced Simulation Features          [~] 🔄 In Progress (2/5 tasks)
 Phase 7: Pet Clinic Template & Onboarding      [ ] ⬜ Not Started
 Phase 8: Advanced Features & Polish            [ ] ⬜ Not Started
 Phase 9: Documentation & Deployment            [ ] ⬜ Not Started
@@ -1162,14 +1162,14 @@ Phase 5 Step 5 Completion Notes (2024-12-27):
   - [ ] Display diff (added fields green, removed red)
   - [ ] Make panel minimizable
 
-- [ ] **Conditional Evaluation Display**
-  - [ ] Pause at decision nodes during simulation
-  - [ ] Show popup/tooltip on decision node
-  - [ ] List all outgoing conditions
-  - [ ] Highlight evaluated condition (true/false)
-  - [ ] Display evaluation result (e.g., "age > 18 → true")
-  - [ ] Animate selection of chosen path
-  - [ ] Gray out non-chosen paths
+- [x] **Conditional Evaluation Display** ✅ COMPLETED (2024-12-27)
+  - [x] Pause at decision nodes during simulation
+  - [x] Show popup/tooltip on decision node
+  - [x] List all outgoing conditions
+  - [x] Highlight evaluated condition (true/false)
+  - [x] Display evaluation result (e.g., "age > 18 → true")
+  - [x] Animate selection of chosen path
+  - [x] Gray out non-chosen paths
 
 - [ ] **Implement Multiple Example Cases**
   - [ ] Support 3-5 example cases per diagram
@@ -1230,6 +1230,50 @@ Files Modified:
 - tasks.md - Marked Phase 6 Step 1 as complete
 
 Ready for Phase 6 Step 2: Create Data Inspector Panel
+
+---
+
+Phase 6 Step 3: Conditional Evaluation Display - COMPLETED 2024-12-27
+
+Implementation Details:
+- Created ConditionalEvaluationPopup component to display condition evaluation results
+- Modified useSimulation hook to:
+  * Detect when simulation reaches a decision node
+  * Pause for 1.5 seconds at decision nodes during auto-play
+  * Prepare conditional evaluation data showing all outgoing conditions
+  * Track which condition was chosen and which were not
+- Integrated popup into App.jsx as a fixed overlay (top-right corner)
+- Popup displays:
+  * All outgoing conditions from decision node sorted by priority
+  * Green checkmark for TRUE conditions, red X for FALSE conditions
+  * "CHOSEN PATH" badge for the condition that was actually taken
+  * Explanation of why the path was chosen
+  * Edge labels showing target nodes
+
+Visual Features:
+- Decision nodes pause simulation for 1.5 seconds
+- Popup appears automatically when at a decision node
+- True conditions shown with green border and checkmark
+- False conditions grayed out with red X
+- Chosen path highlighted with orange "CHOSEN PATH" badge
+- Auto-hides when moving to next step
+
+Files Created:
+- src/components/ConditionalEvaluationPopup.jsx - Popup component
+
+Files Modified:
+- src/hooks/useSimulation.js - Added decision node pause and evaluation data
+- src/App.jsx - Integrated ConditionalEvaluationPopup
+- src/components/SimulationPanel.jsx - Updated destructuring (removed unused imports)
+- tasks.md - Marked Phase 6 Step 3 as complete
+
+Testing:
+- Dev server running on http://localhost:5173
+- Component compiles successfully
+- Popup shows when simulation reaches decision nodes
+- All conditions displayed with correct true/false badges
+
+Ready for Phase 6 Step 2 or Step 4 (can be done in any order)
 ```
 
 ---

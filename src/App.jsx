@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Canvas from "./components/Canvas";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import EdgeConditionPanel from "./components/EdgeConditionPanel";
+import ConditionalEvaluationPopup from "./components/ConditionalEvaluationPopup";
 import SaveDiagramDialog from "./components/SaveDiagramDialog";
 import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
@@ -147,6 +148,16 @@ function DiagramContent({
           onUpdateEdge={updateEdge}
         />
       </div>
+
+      {/* Conditional Evaluation Popup - shows during simulation at decision nodes */}
+      {simulationState?.conditionalEvaluationData && (
+        <ConditionalEvaluationPopup
+          evaluationData={simulationState.conditionalEvaluationData}
+          onClose={() => {
+            // Popup will auto-hide when moving to next step
+          }}
+        />
+      )}
     </>
   );
 }
