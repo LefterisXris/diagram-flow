@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Handle, Position } from "reactflow";
 import * as Icons from "lucide-react";
 
-const ServiceNode = ({ data, selected }) => {
+const ServiceNode = memo(({ data, selected }) => {
   // Dynamically get icon component, fallback to Server if not found
   const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.Server;
 
@@ -71,6 +72,8 @@ const ServiceNode = ({ data, selected }) => {
       />
     </div>
   );
-};
+});
+
+ServiceNode.displayName = 'ServiceNode';
 
 export default ServiceNode;

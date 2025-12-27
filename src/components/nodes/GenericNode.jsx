@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Handle, Position } from "reactflow";
 import * as Icons from "lucide-react";
 
-const GenericNode = ({ data, selected }) => {
+const GenericNode = memo(({ data, selected }) => {
   // Dynamically get icon component, fallback to Box if not found
   const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.Box;
 
@@ -54,6 +55,8 @@ const GenericNode = ({ data, selected }) => {
       />
     </div>
   );
-};
+});
+
+GenericNode.displayName = 'GenericNode';
 
 export default GenericNode;

@@ -1,7 +1,8 @@
+import { memo } from "react";
 import { Handle, Position } from "reactflow";
 import * as Icons from "lucide-react";
 
-const DatabaseNode = ({ data, selected }) => {
+const DatabaseNode = memo(({ data, selected }) => {
   // Dynamically get icon component, fallback to Database if not found
   const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.Database;
 
@@ -71,6 +72,8 @@ const DatabaseNode = ({ data, selected }) => {
       />
     </div>
   );
-};
+});
+
+DatabaseNode.displayName = 'DatabaseNode';
 
 export default DatabaseNode;
