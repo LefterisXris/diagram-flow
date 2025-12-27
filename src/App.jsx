@@ -10,6 +10,7 @@ import DataInspectorPanel from "./components/DataInspectorPanel";
 import SaveDiagramDialog from "./components/SaveDiagramDialog";
 import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
+import WelcomeScreen from "./components/WelcomeScreen";
 import { useDiagramState } from "./hooks/useDiagramState";
 import { useSession } from "./hooks/useSession";
 import { useSimulationHistory } from "./hooks/useSimulationHistory";
@@ -223,6 +224,7 @@ function App() {
   const [showMermaidImportDialog, setShowMermaidImportDialog] = useState(false);
   const [pendingViewport, setPendingViewport] = useState(null);
   const [simulationState, setSimulationState] = useState(null);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
 
   // Simulation history tracking
   const {
@@ -260,6 +262,14 @@ function App() {
   if (isInitialized && sessionId) {
     console.log(`Session initialized: ${sessionId}`);
   }
+
+  // Check if this is the first visit and show welcome screen
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('has_visited');
+    if (!hasVisited) {
+      setShowWelcomeScreen(true);
+    }
+  }, []);
 
   // Warn before closing tab if unsaved changes
   useEffect(() => {
@@ -403,6 +413,29 @@ function App() {
     console.log(`Mermaid diagram imported: ${nodes.length} nodes, ${edges.length} edges`);
   };
 
+  // Welcome screen handlers
+  const handleStartWithTemplate = () => {
+    // Mark as visited
+    localStorage.setItem('has_visited', 'true');
+
+    // TODO: Phase 7 Step 4 - Load Pet Clinic template
+    // For now, just close the welcome screen
+    console.log('User chose: Start with Pet Clinic Template');
+    // Template loading will be implemented in Phase 7 Step 4
+  };
+
+  const handleStartEmpty = () => {
+    // Mark as visited
+    localStorage.setItem('has_visited', 'true');
+
+    // Empty canvas is the default state, so just close welcome screen
+    console.log('User chose: Start with Empty Canvas');
+  };
+
+  const handleCloseWelcome = () => {
+    setShowWelcomeScreen(false);
+  };
+
   return (
     <div
       className="h-screen flex flex-col"
@@ -475,6 +508,15 @@ function App() {
         onClose={() => setShowMermaidImportDialog(false)}
         onImport={handleMermaidImport}
       />
+
+      {/* Welcome Screen */}
+      {showWelcomeScreen && (
+        <WelcomeScreen
+          onStartWithTemplate={handleStartWithTemplate}
+          onStartEmpty={handleStartEmpty}
+          onClose={handleCloseWelcome}
+        />
+      )}
     </div>
   );
 }

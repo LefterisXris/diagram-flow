@@ -8,7 +8,7 @@
 
 **Project Start Date**: 2024-12-26
 **Target Completion**: ~12-16 weeks
-**Current Phase**: Phase 6 Complete! Moving to Phase 7 (All 5 tasks done)
+**Current Phase**: Phase 7 In Progress (Steps 1-2 Complete, 2/5 tasks done)
 
 ---
 
@@ -22,7 +22,7 @@ Phase 3: State Persistence & File Management   [✓] ✅ Done (6/6 tasks)
 Phase 4: Conditional Nodes & Branching Logic   [✓] ✅ Done (3/3 tasks)
 Phase 5: Example Cases & Flow Simulation       [✓] ✅ Done (5/5 tasks)
 Phase 6: Advanced Simulation Features          [✓] ✅ Done (5/5 tasks)
-Phase 7: Pet Clinic Template & Onboarding      [ ] ⬜ Not Started
+Phase 7: Pet Clinic Template & Onboarding      [~] 🔄 In Progress (2/5 tasks)
 Phase 8: Advanced Features & Polish            [ ] ⬜ Not Started
 Phase 9: Documentation & Deployment            [ ] ⬜ Not Started
 ```
@@ -1526,28 +1526,28 @@ Phase 6 Complete - All 5 Steps Implemented!
 **Deliverable**: Default template loads on first launch, great first-time user experience
 
 ### Tasks
-- [ ] **Create Pet Clinic Template Data**
-  - [ ] Define template in `src/templates/petClinic.js`
-  - [ ] Create 3 nodes: Angular Frontend, Spring Boot Backend, MySQL Database
-  - [ ] Position nodes for clean layout
-  - [ ] Add rich metadata (tech stack, features, endpoints, tables)
-  - [ ] Add connections with labels (HTTP/REST, JDBC)
-  - [ ] Add 1 decision node: Authentication check
+- [x] **Create Pet Clinic Template Data** ✅ COMPLETED (2024-12-27)
+  - [x] Define template in `src/templates/petClinic.js`
+  - [x] Create 3 nodes: Angular Frontend, Spring Boot Backend, MySQL Database
+  - [x] Position nodes for clean layout
+  - [x] Add rich metadata (tech stack, features, endpoints, tables)
+  - [x] Add connections with labels (HTTP/REST, JDBC)
+  - [x] Add 1 decision node: Authentication check
 
-- [ ] **Implement Example Cases for Pet Clinic**
-  - [ ] Define "User Login" case (success path)
-  - [ ] Define "Create Pet" case (CRUD operation)
-  - [ ] Define "Invalid Owner Error" case (error handling)
-  - [ ] Include realistic input data
-  - [ ] Define expected paths
+- [x] **Implement Example Cases for Pet Clinic** ✅ COMPLETED (2024-12-27)
+  - [x] Define "User Login" case (success path)
+  - [x] Define "Create Pet" case (CRUD operation)
+  - [x] Define "Invalid Owner Error" case (error handling)
+  - [x] Include realistic input data
+  - [x] Define expected paths
 
-- [ ] **Create Welcome Screen**
-  - [ ] Show on first launch (check localStorage: `has_visited`)
-  - [ ] Design modal/overlay with welcome message
-  - [ ] Add feature highlights
-  - [ ] "Start with Pet Clinic Template" button
-  - [ ] "Start with Empty Canvas" button
-  - [ ] Set flag after choice: `has_visited: true`
+- [x] **Create Welcome Screen** ✅ COMPLETED (2024-12-27)
+  - [x] Show on first launch (check localStorage: `has_visited`)
+  - [x] Design modal/overlay with welcome message
+  - [x] Add feature highlights
+  - [x] "Start with Pet Clinic Template" button
+  - [x] "Start with Empty Canvas" button
+  - [x] Set flag after choice: `has_visited: true`
 
 - [ ] **Implement Template Loading**
   - [ ] Load Pet Clinic on "Start with Template" click
@@ -1570,7 +1570,437 @@ Phase 6 Complete - All 5 Steps Implemented!
 
 ### Notes
 ```
-[Add notes, blockers, or observations here]
+Phase 7 Step 1: Create Pet Clinic Template Data - COMPLETED 2024-12-27
+
+Implementation Details:
+- Created comprehensive Pet Clinic template in src/templates/petClinic.js
+- Template follows architect.md Section 10.4 specifications exactly
+- Designed as a classic 3-tier web application architecture
+
+Template Structure:
+1. **Metadata**:
+   - name: "Pet Clinic - Spring Boot + Angular"
+   - description: Classic 3-tier CRUD application
+   - version: 1.0.0
+   - Includes creation timestamp
+
+2. **Angular Frontend Node** (client type):
+   - Position: (100, 250) - Left side
+   - Icon: Layout
+   - Tech Stack: Angular 18, TypeScript, RxJS, Angular Material
+   - Features: 6 key features including authentication, CRUD operations
+   - Routes: 6 routes (/login, /dashboard, /pets, /owners, /vets, /visits)
+   - Dependencies: All major Angular 18 packages listed
+   - Rich metadata with complete implementation details
+
+3. **Authentication Decision Node** (decision type):
+   - Position: (400, 250) - Center
+   - Icon: Shield
+   - Logic: JWT token validation
+   - Conditions: Valid, Invalid, Expired paths
+   - Security: Signature verification, expiration check, role validation
+   - Demonstrates conditional logic for authentication flow
+
+4. **Spring Boot Backend Node** (service type):
+   - Position: (700, 250) - Center-right
+   - Icon: Server
+   - Tech Stack: Java 21, Spring Boot 3.2, Spring Data JPA, Spring Security
+   - Endpoints: 14 RESTful endpoints (auth, pets, owners, vets, visits)
+   - Features: 7 features including JWT auth, RBAC, validation
+   - Services: 5 business services listed
+   - Dependencies: All major Spring Boot 3.2 packages
+   - Complete API specification
+
+5. **MySQL Database Node** (database type):
+   - Position: (1000, 250) - Right side
+   - Icon: Database
+   - Tech Stack: MySQL 8.0 with InnoDB
+   - Tables: 7 tables (users, pets, owners, vets, visits, pet_types, specialties)
+   - Schema: Complete column definitions with types, constraints
+   - Indexes: Performance optimization indexes listed
+   - Features: Foreign keys, ACID compliance, UTF-8 support
+
+6. **Connections (Edges)**:
+   - Angular → Auth Decision: "User Request" (HTTP/HTTPS, JSON)
+   - Auth Decision → Spring Backend: "Valid Credentials" (conditional, priority 1)
+   - Auth Decision → Angular: "Invalid Credentials (401)" (conditional, priority 2, red dashed)
+   - Spring Backend → MySQL: "JDBC Connection" (MySQL Protocol, HikariCP)
+   - MySQL → Spring Backend: "Query Result" (ResultSet/Entity Objects)
+   - Spring Backend → Angular: "HTTP Response (JSON)" (status codes listed)
+
+Key Design Decisions:
+- Horizontal layout (left to right) for clear data flow visualization
+- Y-position consistent (250) for aligned, clean appearance
+- Spacing of 300px between major nodes for readability
+- Decision node positioned between frontend and backend (logical flow)
+- Return path for invalid auth shown with red dashed line
+- Bidirectional communication between backend and database
+- Complete round-trip flow from frontend to database and back
+
+Metadata Quality:
+- Every node has 6-10 feature points
+- All tech stacks include version numbers
+- Real-world API endpoints documented
+- Database schema includes column types and constraints
+- Connections specify protocols and data formats
+- Security considerations documented
+- Dependencies listed with version numbers
+
+Template Export:
+- Exported as ES6 module with named export
+- Includes default export for flexibility
+- Viewport settings for optimal initial view (zoom: 0.8)
+- Ready for import in welcome screen and template loading
+
+File Statistics:
+- ~330 lines of well-documented code
+- 4 nodes (3 main + 1 decision)
+- 6 edges (connections)
+- Complete metadata for every element
+- JSDoc comments for clarity
+
+Matches Requirements:
+✅ src/templates/petClinic.js created
+✅ 3 nodes match architect.md Section 10.4 exactly
+✅ Rich metadata (tech stack, features, endpoints, tables) complete
+✅ Connections defined with detailed labels and protocols
+✅ Decision node for authentication included
+✅ Clean horizontal layout with proper positioning
+✅ Exportable as importable object
+
+Ready for Phase 7 Step 2: Implement Example Cases for Pet Clinic
+
+---
+
+Phase 7 Step 2: Implement Example Cases for Pet Clinic - COMPLETED 2024-12-27
+
+Implementation Details:
+- Added 3 comprehensive example cases to petClinic.js template
+- Cases demonstrate different scenarios: success, CRUD, and error handling
+- All cases include realistic input data and expected execution paths
+- Added detailed highlights explaining each step of the flow
+
+Example Case 1: User Login Flow (Success Path)
+- **ID**: case-login-success
+- **Name**: "User Login Flow"
+- **Description**: Successful user authentication through JWT validation
+- **Input Data**:
+  * username: "admin"
+  * password: "admin123"
+  * credentials.valid: true
+- **Starting Node**: angular-frontend
+- **Expected Path**: 6 nodes (complete round trip)
+  1. angular-frontend → auth-decision
+  2. auth-decision → spring-backend (valid credentials)
+  3. spring-backend → mysql-database
+  4. mysql-database → spring-backend
+  5. spring-backend → angular-frontend
+- **Highlights**: 5 edge highlights with detailed reasons
+  * User submits login credentials
+  * Credentials validated successfully
+  * Database verifies user
+  * Returns user record
+  * JWT token generated and returned
+- **Purpose**: Demonstrates successful authentication flow with conditional logic
+
+Example Case 2: Create New Pet (CRUD Operation)
+- **ID**: case-create-pet
+- **Name**: "Create New Pet"
+- **Description**: CRUD operation with owner validation before creating pet record
+- **Input Data**:
+  * name: "Fluffy"
+  * type: "cat"
+  * birthDate: "2022-05-15"
+  * ownerId: 42 (valid owner)
+  * credentials.valid: true
+  * JWT token included
+- **Starting Node**: angular-frontend
+- **Expected Path**: 6 nodes (complete round trip)
+  1. angular-frontend → auth-decision
+  2. auth-decision → spring-backend (JWT valid)
+  3. spring-backend → mysql-database
+  4. mysql-database → spring-backend
+  5. spring-backend → angular-frontend
+- **Highlights**: 5 edge highlights with validation steps
+  * Form submission with JWT
+  * Token validation passes
+  * Owner validation + pet insertion
+  * New pet record returned with ID
+  * Success response to frontend
+- **Purpose**: Demonstrates CRUD operations with validation and authentication
+
+Example Case 3: Invalid Owner Error (Error Handling)
+- **ID**: case-invalid-owner
+- **Name**: "Invalid Owner Error"
+- **Description**: Error handling when creating pet with non-existent owner
+- **Input Data**:
+  * name: "Spot"
+  * type: "dog"
+  * birthDate: "2023-01-10"
+  * ownerId: 999 (INVALID - does not exist)
+  * credentials.valid: true
+  * JWT token included
+- **Starting Node**: angular-frontend
+- **Expected Path**: 6 nodes (same path, but error returned)
+  1. angular-frontend → auth-decision
+  2. auth-decision → spring-backend (JWT valid)
+  3. spring-backend → mysql-database
+  4. mysql-database → spring-backend
+  5. spring-backend → angular-frontend
+- **Highlights**: 5 edge highlights showing error flow
+  * Form submitted with invalid owner ID
+  * Token validation succeeds
+  * Database query for owner validation
+  * NULL returned (owner not found)
+  * 404 Not Found error returned to frontend
+- **Purpose**: Demonstrates error handling and validation failure
+
+Technical Implementation:
+- Cases added to template's `exampleCases` array
+- Each case follows DiagramFlow example case structure:
+  * Unique ID for tracking
+  * Name and description for display
+  * input.nodeId specifying starting point
+  * input.data with realistic test data
+  * expectedPath array with node IDs in order
+  * highlights array explaining each transition
+- Data structure matches existing example case format
+- Cases are immediately available when template is loaded
+
+Data Realism:
+- Usernames and passwords match typical admin credentials
+- Pet data includes realistic attributes (name, type, birthDate)
+- Owner IDs use realistic numbers (42 for valid, 999 for invalid)
+- JWT tokens shown as placeholder (real tokens too long)
+- Credentials object included for decision node evaluation
+
+Path Coverage:
+- All 3 cases use same physical path through the diagram
+- Differences are in the data and outcomes:
+  * Case 1: Authentication success
+  * Case 2: CRUD operation success
+  * Case 3: Validation failure (error state)
+- Demonstrates that same path can have different outcomes
+- Shows importance of data inspection during simulation
+
+Highlights Quality:
+- Each highlight includes:
+  * edgeId: Reference to specific connection
+  * reason: Plain English explanation of what happens
+- 5 highlights per case (one for each edge in the path)
+- Explains business logic, not just technical flow
+- Helps users understand WHY each step occurs
+
+Template Integration:
+- Cases seamlessly integrated into petClinic.js
+- Positioned before viewport settings
+- No breaking changes to existing template structure
+- Ready for immediate use in simulation
+
+File Statistics:
+- Added ~150 lines of example case definitions
+- 3 complete example cases
+- 15 edge highlights total (5 per case)
+- Realistic data for all scenarios
+
+Matches Requirements:
+✅ All 3 example cases created
+✅ Case 1: User Login Flow with auth path
+✅ Case 2: Create New Pet with validation
+✅ Case 3: Invalid Owner Error with error handling
+✅ Realistic input data defined
+✅ Expected paths specified
+✅ Cases added to template
+
+Ready for Phase 7 Step 3: Create Welcome Screen
+
+---
+
+Phase 7 Step 3: Create Welcome Screen - COMPLETED 2024-12-27
+
+Implementation Details:
+- Created comprehensive welcome screen component (WelcomeScreen.jsx)
+- Integrated into App.jsx with localStorage check for first-time visitors
+- Full-screen overlay with gradient background and professional styling
+- 6 feature highlights with icons and descriptions
+- Two action buttons for template or empty canvas
+
+WelcomeScreen Component (src/components/WelcomeScreen.jsx):
+- **File Size**: 280 lines of well-structured React code
+- **Props**:
+  * onStartWithTemplate - Handler for template button
+  * onStartEmpty - Handler for empty canvas button
+  * onClose - Handler to dismiss the welcome screen
+- **Layout**:
+  * Fixed full-screen overlay with backdrop blur
+  * Centered modal with max-width 4xl (1024px)
+  * Responsive design with mobile support
+  * Smooth fade/scale animations on open/close
+- **Header Section**:
+  * DiagramFlow logo with gradient background
+  * Sparkles icon in blue-purple gradient box
+  * Title: "Welcome to DiagramFlow"
+  * Tagline: "Build, Simulate, Visualize"
+  * Professional gradient background effect
+- **Feature Highlights (6 features)**:
+  1. Interactive Flow Diagrams (GitBranch icon)
+     - Build diagrams with drag & drop
+     - Multiple node types with rich metadata
+  2. Conditional Logic (Zap icon)
+     - Decision nodes with conditional branching
+     - Visualize complex flows clearly
+  3. Flow Simulation (Play icon)
+     - Run example cases with step-by-step execution
+     - Watch data flow through system
+  4. Data Inspector (Database icon)
+     - Track data transformations at each node
+     - See input, output, changes in real-time
+  5. Simulation History (History icon)
+     - Track all simulation runs
+     - Replay executions and compare results
+  6. 100% Client-Side (FileText icon)
+     - No backend required
+     - Local storage with JSON/Mermaid export
+- **Call-to-Action Section**:
+  * Blue highlight box with instructions
+  * "How would you like to start?" heading
+  * Description of both options
+- **Action Buttons (2 buttons)**:
+  1. Start with Pet Clinic Template
+     - Blue gradient background
+     - Sparkles icon
+     - "Recommended for first-time users" badge
+     - Hover scale animation (105%)
+     - Description of Pet Clinic template
+  2. Start with Empty Canvas
+     - Secondary styling with border
+     - FileText icon
+     - "For experienced users" badge
+     - Hover scale animation
+     - Description of blank canvas
+- **Footer**:
+  * Information about one-time display
+  * Note about loading templates later
+  * 3 progress dots (blue, gray, gray)
+- **Animations**:
+  * 300ms fade-in on mount
+  * 300ms fade-out on close
+  * Scale from 95% to 100%
+  * Button hover effects
+- **Styling**:
+  * Uses CSS custom properties for theming
+  * var(--bg-primary), var(--text-primary), etc.
+  * Full dark/light theme support
+  * Responsive grid (2 columns on md+, 1 on mobile)
+  * Professional spacing and typography
+
+App.jsx Integration:
+- **Import**: Added WelcomeScreen component import (line 13)
+- **State**: Added showWelcomeScreen state variable (line 227)
+- **First Visit Check**:
+  * useEffect hook checks localStorage.getItem('has_visited')
+  * If not set, shows welcome screen (lines 267-272)
+  * Only runs once on mount
+- **Handler Functions**:
+  1. handleStartWithTemplate (lines 417-425):
+     - Sets localStorage: has_visited = 'true'
+     - Logs user choice to console
+     - TODO comment for Phase 7 Step 4 (load template)
+     - Placeholder for template loading implementation
+  2. handleStartEmpty (lines 427-433):
+     - Sets localStorage: has_visited = 'true'
+     - Logs user choice
+     - Default state is empty canvas (no action needed)
+  3. handleCloseWelcome (lines 435-437):
+     - Closes welcome screen
+     - Sets showWelcomeScreen to false
+- **JSX Rendering** (lines 512-519):
+  * Conditional rendering based on showWelcomeScreen
+  * Passes all three handler props
+  * Positioned after other dialogs (Save, Open, Mermaid)
+  * Within main app container
+
+localStorage Flag:
+- **Key**: 'has_visited'
+- **Value**: 'true' (string)
+- **Set When**: User clicks either action button
+- **Checked When**: App component mounts (useEffect)
+- **Behavior**:
+  * First visit: Flag not set → Show welcome screen
+  * Subsequent visits: Flag set → Skip welcome screen
+  * Persists across browser sessions
+  * User can clear browser data to see welcome again
+
+Feature Highlights Content:
+1. **Interactive Flow Diagrams**:
+   - Build system diagrams with drag & drop
+   - Multiple node types with rich metadata
+2. **Conditional Logic**:
+   - Add decision nodes with conditional branching
+   - Visualize complex flows clearly
+3. **Flow Simulation**:
+   - Run example cases and watch data flow
+   - Step-by-step execution through system
+4. **Data Inspector**:
+   - Track data transformations at each node
+   - See input, output, and changes in real-time
+5. **Simulation History**:
+   - Track all simulation runs
+   - Replay previous executions
+   - Compare results
+6. **100% Client-Side**:
+   - No backend required
+   - All data stored locally
+   - Export to JSON or Mermaid
+
+User Experience Flow:
+1. User visits DiagramFlow for first time
+2. Welcome screen fades in with backdrop blur
+3. User reads feature highlights
+4. User chooses between:
+   a. Pet Clinic Template (recommended) - TODO: Phase 7 Step 4
+   b. Empty Canvas (immediately available)
+5. localStorage flag set to prevent re-showing
+6. Welcome screen fades out with animation
+7. User proceeds to main application
+
+Design Decisions:
+- **Full-screen overlay**: Ensures user sees welcome screen
+- **Backdrop blur**: Creates focus on modal content
+- **Gradient accents**: Matches DiagramFlow branding
+- **Feature icons**: Visual appeal and clarity
+- **Two clear options**: Prevents decision paralysis
+- **Recommended badge**: Guides first-time users
+- **One-time display**: Doesn't annoy returning users
+- **Progress dots**: Visual indicator (phase indicator concept)
+- **Responsive design**: Works on all screen sizes
+- **Animation timing**: Fast enough (300ms) to feel responsive
+
+Technical Implementation:
+- Pure React functional component with hooks
+- useState for animation state (isClosing)
+- setTimeout for animation delay before callback
+- Lucide React icons for all visual elements
+- Tailwind CSS classes for layout
+- CSS custom properties for theming
+- No external dependencies beyond existing stack
+- Fully accessible markup
+
+Matches Requirements:
+✅ Welcome screen shows on first launch
+✅ localStorage check for has_visited flag
+✅ Full-screen modal/overlay design
+✅ Welcome message with branding
+✅ 6 feature highlights with icons and descriptions
+✅ "Start with Pet Clinic Template" button
+✅ "Start with Empty Canvas" button
+✅ Flag set after choice (has_visited: true)
+✅ Integrated into App.jsx
+✅ Professional styling with theme support
+✅ Smooth animations and transitions
+✅ Responsive design
+
+Ready for Phase 7 Step 4: Implement Template Loading
 ```
 
 ---
