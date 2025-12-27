@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { ReactFlowProvider, useReactFlow } from "reactflow";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
@@ -13,9 +13,12 @@ import MermaidImportDialog from "./components/MermaidImportDialog";
 import ExportDialog from "./components/ExportDialog";
 import WelcomeScreen from "./components/WelcomeScreen";
 import TutorialOverlay from "./components/TutorialOverlay";
+import KeyboardCheatsheet from "./components/KeyboardCheatsheet";
 import { useDiagramState } from "./hooks/useDiagramState";
 import { useSession } from "./hooks/useSession";
 import { useSimulationHistory } from "./hooks/useSimulationHistory";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
+import { useHistory } from "./hooks/useHistory";
 import { exportDiagram } from "./utils/exportDiagram";
 import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
@@ -186,6 +189,10 @@ function DiagramContent({
         onStartTutorial={onStartTutorial}
         searchQuery={searchQuery}
         onSearchChange={onSearchChange}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
       <div ref={reactFlowWrapperRef} className="flex-1 flex overflow-hidden">
         <Sidebar
@@ -306,9 +313,13 @@ function App() {
   const [templateJustLoaded, setTemplateJustLoaded] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showCheatsheet, setShowCheatsheet] = useState(false);
 
   // Ref for React Flow container (for advanced exports)
   const reactFlowWrapperRef = useRef(null);
+
+  // Ref for search input (for focus shortcut)
+  const searchInputRef = useRef(null);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -326,6 +337,30 @@ function App() {
     clearHistory,
     deleteHistoryItem,
   } = useSimulationHistory(currentDiagramId);
+
+  // Undo/Redo history management
+  const handleRestoreState = useCallback((state) => {
+    setNodes(state.nodes);
+    setEdges(state.edges);
+    setExampleCases(state.exampleCases);
+  }, [setNodes, setEdges, setExampleCases]);
+
+  const {
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    pushState,
+  } = useHistory(
+    { nodes, edges, exampleCases },
+    handleRestoreState,
+    `diagram_history_${currentDiagramId || 'default'}`
+  );
+
+  // Push state to history whenever diagram changes (debounced)
+  useEffect(() => {
+    pushState({ nodes, edges, exampleCases });
+  }, [nodes, edges, exampleCases, pushState]);
 
   // Search & Filter computed values
   const { visibleNodeIds, visibleCount, totalCount } = useMemo(() => {
@@ -657,6 +692,80 @@ function App() {
     console.log('Tutorial skipped. You can restart it anytime from the Help menu.');
   };
 
+  // Keyboard shortcut handlers
+  const handleDeleteKey = () => {
+    if (selectedNode) {
+      // Delete selected node
+      setNodes((nds) => nds.filter((n) => n.id !== selectedNode.id));
+      setEdges((eds) => eds.filter((e) => e.source !== selectedNode.id && e.target !== selectedNode.id));
+      setSelectedNode(null);
+      console.log(`Deleted node: ${selectedNode.data.label}`);
+    } else if (selectedEdgeId) {
+      // Delete selected edge
+      setEdges((eds) => eds.filter((e) => e.id !== selectedEdgeId));
+      setSelectedEdgeId(null);
+      console.log(`Deleted edge: ${selectedEdgeId}`);
+    }
+  };
+
+  const handleDuplicateNode = () => {
+    if (selectedNode) {
+      const newNode = {
+        ...selectedNode,
+        id: `${selectedNode.type}-${Date.now()}`,
+        position: {
+          x: selectedNode.position.x + 50,
+          y: selectedNode.position.y + 50,
+        },
+        data: {
+          ...selectedNode.data,
+          label: `${selectedNode.data.label} (Copy)`,
+        },
+      };
+      setNodes((nds) => [...nds, newNode]);
+      setSelectedNode(newNode);
+      console.log(`Duplicated node: ${selectedNode.data.label}`);
+    }
+  };
+
+  const handleFocusSearch = () => {
+    // Focus the search input
+    const searchInput = document.querySelector('input[placeholder="Search nodes..."]');
+    if (searchInput) {
+      searchInput.focus();
+    }
+  };
+
+  const handleShowCheatsheet = () => {
+    setShowCheatsheet(true);
+  };
+
+  const handleUndo = () => {
+    if (canUndo) {
+      undo();
+      console.log('Undo: Restored previous state');
+    }
+  };
+
+  const handleRedo = () => {
+    if (canRedo) {
+      redo();
+      console.log('Redo: Restored next state');
+    }
+  };
+
+  // Setup keyboard shortcuts
+  useKeyboardShortcuts({
+    onSave: handleExportComplete,
+    onOpen: handleOpenClick,
+    onDelete: handleDeleteKey,
+    onUndo: handleUndo,
+    onRedo: handleRedo,
+    onDuplicate: handleDuplicateNode,
+    onFocusSearch: handleFocusSearch,
+    onShowCheatsheet: handleShowCheatsheet,
+  });
+
   return (
     <div
       className="h-screen flex flex-col"
@@ -751,6 +860,12 @@ function App() {
         onClose={() => setShowExportDialog(false)}
         onExport={handleAdvancedExport}
         diagramName={currentDiagramName || 'diagram'}
+      />
+
+      {/* Keyboard Cheatsheet */}
+      <KeyboardCheatsheet
+        isOpen={showCheatsheet}
+        onClose={() => setShowCheatsheet(false)}
       />
 
       {/* Welcome Screen */}

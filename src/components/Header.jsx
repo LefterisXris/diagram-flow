@@ -1,10 +1,12 @@
-import { Layout, Download, Upload, Save, FolderOpen, GitMerge, HelpCircle, Search, X } from "lucide-react";
+import { Layout, Download, Upload, Save, FolderOpen, GitMerge, HelpCircle, Search, X, Undo2, Redo2 } from "lucide-react";
 import { useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
 import SaveStatus from "./SaveStatus";
+import { getModKeyDisplay } from "../hooks/useKeyboardShortcuts";
 
-const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, lastSaved, onStartTutorial, searchQuery, onSearchChange }) => {
+const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, lastSaved, onStartTutorial, searchQuery, onSearchChange, onUndo, onRedo, canUndo, canRedo }) => {
   const fileInputRef = useRef(null);
+  const modKey = getModKeyDisplay();
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -52,6 +54,7 @@ const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, 
                 value={searchQuery || ''}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search nodes..."
+                title="Search nodes (Press / to focus)"
                 className="w-full pl-10 pr-10 py-2 rounded-lg text-sm border outline-none transition-colors"
                 style={{
                   backgroundColor: "var(--bg-tertiary)",
@@ -81,10 +84,42 @@ const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, 
                 backgroundColor: "var(--accent-blue)",
                 color: "#ffffff",
               }}
-              title="Save diagram"
+              title={`Save diagram (${modKey}+S)`}
             >
               <Save className="w-4 h-4" />
               Save
+            </button>
+          )}
+          {onUndo && (
+            <button
+              onClick={onUndo}
+              disabled={!canUndo}
+              className="p-2 rounded-lg transition-colors border"
+              style={{
+                borderColor: "var(--border-primary)",
+                color: canUndo ? "var(--text-primary)" : "var(--text-muted)",
+                opacity: canUndo ? 1 : 0.5,
+                cursor: canUndo ? "pointer" : "not-allowed",
+              }}
+              title={`Undo (${modKey}+Z)`}
+            >
+              <Undo2 className="w-4 h-4" />
+            </button>
+          )}
+          {onRedo && (
+            <button
+              onClick={onRedo}
+              disabled={!canRedo}
+              className="p-2 rounded-lg transition-colors border"
+              style={{
+                borderColor: "var(--border-primary)",
+                color: canRedo ? "var(--text-primary)" : "var(--text-muted)",
+                opacity: canRedo ? 1 : 0.5,
+                cursor: canRedo ? "pointer" : "not-allowed",
+              }}
+              title={`Redo (${modKey}+Shift+Z)`}
+            >
+              <Redo2 className="w-4 h-4" />
             </button>
           )}
           {onOpen && (
@@ -95,7 +130,7 @@ const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, 
                 borderColor: "var(--border-primary)",
                 color: "var(--text-primary)",
               }}
-              title="Open saved diagram"
+              title={`Open saved diagram (${modKey}+O)`}
             >
               <FolderOpen className="w-4 h-4" />
               Open
@@ -160,7 +195,7 @@ const Header = ({ onExport, onImport, onSave, onOpen, onImportMermaid, isDirty, 
                 borderColor: "var(--border-primary)",
                 color: "var(--text-primary)",
               }}
-              title="Start interactive tutorial"
+              title="Start interactive tutorial (Press ? for keyboard shortcuts)"
             >
               <HelpCircle className="w-4 h-4" />
               Help
