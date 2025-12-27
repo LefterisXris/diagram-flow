@@ -8,7 +8,9 @@
       "Bash(dir:*)",
       "Bash(npm uninstall:*)",
       "Bash(git add:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git checkout:*)",
+      "Bash(node:*)"
     ]
   }
 }
