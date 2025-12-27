@@ -8,7 +8,7 @@
 
 **Project Start Date**: 2024-12-26
 **Target Completion**: ~12-16 weeks
-**Current Phase**: Phase 6 In Progress (Step 1 & 3 Complete, 2/5 tasks done)
+**Current Phase**: Phase 6 In Progress (Steps 1, 2, 3 Complete, 3/5 tasks done)
 
 ---
 
@@ -21,7 +21,7 @@ Phase 2: Node Types & Rich Metadata            [✓] ✅ Done (5/5 tasks)
 Phase 3: State Persistence & File Management   [✓] ✅ Done (6/6 tasks)
 Phase 4: Conditional Nodes & Branching Logic   [✓] ✅ Done (3/3 tasks)
 Phase 5: Example Cases & Flow Simulation       [✓] ✅ Done (5/5 tasks)
-Phase 6: Advanced Simulation Features          [~] 🔄 In Progress (2/5 tasks)
+Phase 6: Advanced Simulation Features          [~] 🔄 In Progress (3/5 tasks)
 Phase 7: Pet Clinic Template & Onboarding      [ ] ⬜ Not Started
 Phase 8: Advanced Features & Polish            [ ] ⬜ Not Started
 Phase 9: Documentation & Deployment            [ ] ⬜ Not Started
@@ -1156,11 +1156,11 @@ Phase 5 Step 5 Completion Notes (2024-12-27):
   - [x] Track transformations applied
   - [x] Support data passthrough (input = output initially)
 
-- [ ] **Create Data Inspector Panel**
-  - [ ] Floating draggable panel during simulation
-  - [ ] Show current step data (JSON formatted)
-  - [ ] Display diff (added fields green, removed red)
-  - [ ] Make panel minimizable
+- [x] **Create Data Inspector Panel** ✅ COMPLETED (2024-12-27)
+  - [x] Floating draggable panel during simulation
+  - [x] Show current step data (JSON formatted)
+  - [x] Display diff (added fields green, removed red)
+  - [x] Make panel minimizable
 
 - [x] **Conditional Evaluation Display** ✅ COMPLETED (2024-12-27)
   - [x] Pause at decision nodes during simulation
@@ -1274,6 +1274,64 @@ Testing:
 - All conditions displayed with correct true/false badges
 
 Ready for Phase 6 Step 2 or Step 4 (can be done in any order)
+
+---
+
+Phase 6 Step 2: Create Data Inspector Panel - COMPLETED 2024-12-27
+
+Implementation Details:
+- Created DataInspectorPanel component - a floating, draggable panel
+- Features:
+  * Draggable with mouse (grab handle in header)
+  * Displays current step information (node name, type, step index)
+  * Shows INPUT DATA in JSON format with syntax highlighting
+  * Shows OUTPUT DATA in JSON format with syntax highlighting
+  * Calculates and displays DIFF between input and output
+  * Minimize/Maximize functionality
+  * Position persistence to localStorage
+  * Constrained to viewport bounds during drag
+
+Diff Display Features:
+- Added fields: Green background + green border + "+" prefix
+- Removed fields: Red background + red border + "-" prefix
+- Modified fields: Yellow background + orange border + "~" prefix + before/after values
+- Unchanged fields: Not shown in diff (only in raw data)
+- "No data transformations" message when input === output
+
+Visual Design:
+- Blue accent color matching simulation theme
+- Fixed position on left side (default: x:20, y:100)
+- Draggable via grip icon in header
+- Minimize shows compact "Step X • Node Name" view
+- Full view shows: Step info, Input Data, Output Data, Changes, Transformations
+- Maximum height: 600px with scrollable content
+- Responsive width: 400px (maximized), 250px (minimized)
+
+Technical Implementation:
+- Mouse drag with bounds checking (stays within viewport)
+- Position saved to localStorage key 'dataInspectorPosition'
+- Diff algorithm compares input vs output keys and values
+- JSON.stringify for deep equality checks
+- Auto-shows during active simulation
+- Updates in real-time as simulation progresses
+
+Files Created:
+- src/components/DataInspectorPanel.jsx - Draggable data inspector (415 lines)
+
+Files Modified:
+- src/App.jsx - Integrated DataInspectorPanel
+- tasks.md - Marked Phase 6 Step 2 as complete
+
+Testing:
+- Dev server running successfully
+- Panel appears during simulation
+- Drag functionality working with bounds
+- Minimize/maximize working
+- Position persistence working
+- Diff highlighting displays correctly
+- JSON formatting working
+
+Ready for Phase 6 Step 4 or Step 5 (Step 1, 2, 3 complete)
 ```
 
 ---

@@ -6,6 +6,7 @@ import Canvas from "./components/Canvas";
 import NodeDetailPanel from "./components/NodeDetailPanel";
 import EdgeConditionPanel from "./components/EdgeConditionPanel";
 import ConditionalEvaluationPopup from "./components/ConditionalEvaluationPopup";
+import DataInspectorPanel from "./components/DataInspectorPanel";
 import SaveDiagramDialog from "./components/SaveDiagramDialog";
 import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
@@ -156,6 +157,15 @@ function DiagramContent({
           onClose={() => {
             // Popup will auto-hide when moving to next step
           }}
+        />
+      )}
+
+      {/* Data Inspector Panel - shows current step data during simulation */}
+      {simulationState?.isActive && simulationState?.steps && simulationState?.currentStepIndex >= 0 && (
+        <DataInspectorPanel
+          currentStep={simulationState.steps[simulationState.currentStepIndex]}
+          isActive={true}
+          onClose={null} // Panel stays open during simulation
         />
       )}
     </>
