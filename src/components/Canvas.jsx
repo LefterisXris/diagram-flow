@@ -3,7 +3,7 @@ import ReactFlow, { Background, Controls, addEdge, useReactFlow } from "reactflo
 import "reactflow/dist/style.css";
 import { nodeTypes } from "../config/nodeTypes";
 
-const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, setEdges }) => {
+const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeClick, setEdges }) => {
   const { screenToFlowPosition } = useReactFlow();
 
   // Handle double-click to create node
@@ -46,6 +46,7 @@ const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, setEdge
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeClick={onNodeClick}
         nodeTypes={memoizedNodeTypes}
         fitView
         style={{ backgroundColor: "var(--bg-primary)" }}

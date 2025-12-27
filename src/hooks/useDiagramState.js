@@ -34,12 +34,29 @@ export const useDiagramState = () => {
     return () => clearTimeout(timer);
   }, [nodes, edges]);
 
-  const addNode = useCallback((position) => {
+  const addNode = useCallback((position, type = "generic", icon = null) => {
+    const now = new Date().toISOString();
     const newNode = {
       id: crypto.randomUUID(),
-      type: "generic",
+      type,
       position,
-      data: { label: "New Node" },
+      data: {
+        label: `New ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+        ...(icon && { icon }),
+        shortDescription: "",
+        detailedDescription: "",
+        metadata: {
+          dateAdded: now,
+          dateModified: now,
+          author: "",
+          tags: [],
+          links: [],
+          status: "planned",
+          version: "",
+          owner: "",
+          criticality: "medium",
+        },
+      },
     };
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes]);
@@ -49,6 +66,28 @@ export const useDiagramState = () => {
     setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
   }, [setNodes, setEdges]);
 
+  const updateNode = useCallback((nodeId, updates) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              ...updates,
+              metadata: {
+                ...node.data.metadata,
+                ...(updates.metadata || {}),
+                dateModified: new Date().toISOString(),
+              },
+            },
+          };
+        }
+        return node;
+      })
+    );
+  }, [setNodes]);
+
   return {
     nodes,
     edges,
@@ -56,6 +95,7 @@ export const useDiagramState = () => {
     onEdgesChange,
     addNode,
     deleteNode,
+    updateNode,
     setNodes,
     setEdges,
     lastSaved,

@@ -1,7 +1,10 @@
 import { Handle, Position } from "reactflow";
-import { Box } from "lucide-react";
+import * as Icons from "lucide-react";
 
 const GenericNode = ({ data, selected }) => {
+  // Dynamically get icon component, fallback to Box if not found
+  const IconComponent = data.icon && Icons[data.icon] ? Icons[data.icon] : Icons.Box;
+
   return (
     <div
       className="px-4 py-2 rounded-lg border-2 min-w-[120px] transition-all duration-200"
@@ -30,7 +33,7 @@ const GenericNode = ({ data, selected }) => {
 
       {/* Node content */}
       <div className="flex items-center gap-2">
-        <Box className="w-4 h-4" />
+        <IconComponent className="w-4 h-4" />
         <div className="font-medium">{data.label || "Node"}</div>
       </div>
 
