@@ -49,6 +49,8 @@ function DiagramContent({
   isDirty,
   lastSaved,
   triggerAutoSave,
+  simulationState,
+  onSimulationStateChange,
 }) {
   const { getViewport, setViewport } = useReactFlow();
 
@@ -114,6 +116,8 @@ function DiagramContent({
           onUpdateExampleCase={updateExampleCase}
           onDeleteExampleCase={deleteExampleCase}
           nodes={nodes}
+          edges={edges}
+          onSimulationStateChange={onSimulationStateChange}
         />
         <Canvas
           nodes={nodes}
@@ -127,6 +131,7 @@ function DiagramContent({
           onNodeMouseEnter={onNodeMouseEnter}
           onNodeMouseLeave={onNodeMouseLeave}
           setEdges={setEdges}
+          simulationState={simulationState}
         />
         {selectedNode && (
           <NodeDetailPanel
@@ -185,6 +190,11 @@ function App() {
   const [showOpenDialog, setShowOpenDialog] = useState(false);
   const [showMermaidImportDialog, setShowMermaidImportDialog] = useState(false);
   const [pendingViewport, setPendingViewport] = useState(null);
+  const [simulationState, setSimulationState] = useState(null);
+
+  const handleSimulationStateChange = (newState) => {
+    setSimulationState(newState);
+  };
 
   // Log session initialization (for verification)
   if (isInitialized && sessionId) {
@@ -374,6 +384,8 @@ function App() {
           isDirty={isDirty}
           lastSaved={lastSaved}
           triggerAutoSave={triggerAutoSave}
+          simulationState={simulationState}
+          onSimulationStateChange={handleSimulationStateChange}
         />
       </ReactFlowProvider>
 

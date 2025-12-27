@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Edit2, Trash2, Play, AlertCircle } from "lucide-react";
 
-const ExampleCasesList = ({ exampleCases, onEdit, onDelete, nodes }) => {
+const ExampleCasesList = ({ exampleCases, onEdit, onDelete, onRunSimulation, nodes }) => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const handleDeleteClick = (caseId) => {
@@ -118,6 +118,23 @@ const ExampleCasesList = ({ exampleCases, onEdit, onDelete, nodes }) => {
               </div>
             )}
           </div>
+
+          {/* Run Simulation Button */}
+          {!deleteConfirm && onRunSimulation && (
+            <div className="mt-3">
+              <button
+                onClick={() => onRunSimulation(exampleCase)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium"
+                style={{
+                  backgroundColor: 'var(--accent-blue)',
+                  color: '#ffffff',
+                }}
+              >
+                <Play className="w-4 h-4" />
+                Run Simulation
+              </button>
+            </div>
+          )}
 
           {/* Delete Confirmation */}
           {deleteConfirm === exampleCase.id && (

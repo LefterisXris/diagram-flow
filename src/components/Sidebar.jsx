@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Plus, Box, Server, Database, Monitor, GitBranch, Wrench, FlaskConical } from "lucide-react";
+import { Plus, Box, Server, Database, Monitor, GitBranch, Wrench, FlaskConical, Play } from "lucide-react";
 import * as Icons from "lucide-react";
 import IconPicker from "./IconPicker";
 import ExampleCasesList from "./ExampleCasesList";
 import ExampleCaseForm from "./ExampleCaseForm";
+import SimulationPanel from "./SimulationPanel";
 
 const nodeTypeOptions = [
   { type: "generic", label: "Generic", icon: Box, color: "#3b82f6" },
@@ -25,6 +26,8 @@ const Sidebar = ({
   onUpdateExampleCase,
   onDeleteExampleCase,
   nodes = [],
+  edges = [],
+  onSimulationStateChange,
 }) => {
   const [activeTab, setActiveTab] = useState("tools");
   const [selectedType, setSelectedType] = useState("generic");
@@ -32,6 +35,13 @@ const Sidebar = ({
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showCaseForm, setShowCaseForm] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
+  const [selectedCaseForSimulation, setSelectedCaseForSimulation] = useState(null);
+
+  const handleSimulationStateChange = (simulationState) => {
+    if (onSimulationStateChange) {
+      onSimulationStateChange(simulationState);
+    }
+  };
 
   const handleAddNode = () => {
     onAddNode({ x: 250, y: 150 }, selectedType, selectedIcon);
@@ -201,30 +211,68 @@ const Sidebar = ({
           )}
 
           {activeTab === "cases" && (
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold uppercase" style={{ color: "var(--text-secondary)" }}>
-                  Example Cases
-                </h2>
-                <button
-                  onClick={handleAddCaseClick}
-                  className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
-                  style={{
-                    backgroundColor: "var(--accent-blue)",
-                    color: "#ffffff",
-                  }}
-                >
-                  <Plus className="w-3 h-3" />
-                  Add Case
-                </button>
-              </div>
+            <div className="space-y-4">
+              {selectedCaseForSimulation ? (
+                // Simulation Panel View
+                <div>
+                  <div
+                    className="p-4 border-b flex items-center justify-between"
+                    style={{ borderColor: "var(--border-primary)" }}
+                  >
+                    <div>
+                      <button
+                        onClick={() => setSelectedCaseForSimulation(null)}
+                        className="text-sm hover:underline"
+                        style={{ color: "var(--accent-blue)" }}
+                      >
+                        ← Back to Cases
+                      </button>
+                      <h3 className="font-semibold mt-1" style={{ color: "var(--text-primary)" }}>
+                        {selectedCaseForSimulation.name}
+                      </h3>
+                      {selectedCaseForSimulation.description && (
+                        <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                          {selectedCaseForSimulation.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <SimulationPanel
+                    exampleCase={selectedCaseForSimulation}
+                    nodes={nodes}
+                    edges={edges}
+                    onSimulationStateChange={handleSimulationStateChange}
+                  />
+                </div>
+              ) : (
+                // Cases List View
+                <div className="p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-semibold uppercase" style={{ color: "var(--text-secondary)" }}>
+                      Example Cases
+                    </h2>
+                    <button
+                      onClick={handleAddCaseClick}
+                      className="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
+                      style={{
+                        backgroundColor: "var(--accent-blue)",
+                        color: "#ffffff",
+                      }}
+                    >
+                      <Plus className="w-3 h-3" />
+                      Add Case
+                    </button>
+                  </div>
 
-              <ExampleCasesList
-                exampleCases={exampleCases}
-                onEdit={handleEditCase}
-                onDelete={handleDeleteCase}
-                nodes={nodes}
-              />
+                  <ExampleCasesList
+                    exampleCases={exampleCases}
+                    onEdit={handleEditCase}
+                    onDelete={handleDeleteCase}
+                    onRunSimulation={setSelectedCaseForSimulation}
+                    nodes={nodes}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

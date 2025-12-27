@@ -8,7 +8,7 @@
 
 **Project Start Date**: 2024-12-26
 **Target Completion**: ~12-16 weeks
-**Current Phase**: Phase 0 (In Progress)
+**Current Phase**: Phase 5 Complete, Phase 6 Ready to Start
 
 ---
 
@@ -19,8 +19,8 @@ Phase 0: Foundation & Setup                    [✓] ✅ Done (7/7 tasks)
 Phase 1: Basic Node & Edge Management          [✓] ✅ Done (6/6 tasks)
 Phase 2: Node Types & Rich Metadata            [✓] ✅ Done (5/5 tasks)
 Phase 3: State Persistence & File Management   [✓] ✅ Done (6/6 tasks)
-Phase 4: Conditional Nodes & Branching Logic   [ ] ⬜ Not Started
-Phase 5: Example Cases & Flow Simulation       [ ] ⬜ Not Started
+Phase 4: Conditional Nodes & Branching Logic   [✓] ✅ Done (3/3 tasks)
+Phase 5: Example Cases & Flow Simulation       [✓] ✅ Done (5/5 tasks)
 Phase 6: Advanced Simulation Features          [ ] ⬜ Not Started
 Phase 7: Pet Clinic Template & Onboarding      [ ] ⬜ Not Started
 Phase 8: Advanced Features & Polish            [ ] ⬜ Not Started
@@ -29,7 +29,7 @@ Phase 9: Documentation & Deployment            [ ] ⬜ Not Started
 
 **Legend**: ⬜ Not Started | 🔄 In Progress | ✅ Done | ⚠️ Blocked
 
-**Overall Completion**: 4/10 phases complete (40%)
+**Overall Completion**: 6/10 phases complete (60%)
 
 ---
 
@@ -719,10 +719,10 @@ Phase 3 Step 6 Completion Notes (2024-12-27):
 ---
 
 ## Phase 5: Example Cases & Basic Flow Simulation
-**Status**: 🔄 In Progress
+**Status**: ✅ Done
 **Duration**: 7-10 days
 **Started**: 2024-12-27
-**Completed**: _____
+**Completed**: 2024-12-27
 **Deliverable**: Define example cases, run basic simulation with path highlighting
 
 ### Tasks
@@ -746,21 +746,21 @@ Phase 3 Step 6 Completion Notes (2024-12-27):
   - [x] Return path and evaluation results
   - [x] Handle errors (invalid conditions, circular paths)
 
-- [ ] **Create Simulation UI Controls**
-  - [ ] Simulation panel in sidebar
-  - [ ] Play button (auto-run with delays)
-  - [ ] Pause button
-  - [ ] Step Forward/Back buttons
-  - [ ] Reset button
-  - [ ] Speed slider (0.5x to 3x)
-  - [ ] Progress indicator
+- [x] **Create Simulation UI Controls** ✅ COMPLETED
+  - [x] Simulation panel in sidebar
+  - [x] Play button (auto-run with delays)
+  - [x] Pause button
+  - [x] Step Forward/Back buttons
+  - [x] Reset button
+  - [x] Speed slider (0.5x to 3x)
+  - [x] Progress indicator
 
-- [ ] **Implement Path Highlighting**
-  - [ ] Highlight active node (pulsing border, blue glow)
-  - [ ] Highlight active edge (brighter color, faster animation)
-  - [ ] Show traversed path (dimmed green overlay)
-  - [ ] Preview upcoming path (light gray)
-  - [ ] Clear highlights when simulation ends
+- [x] **Implement Path Highlighting** ✅ COMPLETED
+  - [x] Highlight active node (pulsing border, blue glow)
+  - [x] Highlight active edge (brighter color, faster animation)
+  - [x] Show traversed path (dimmed green overlay)
+  - [x] Preview upcoming path (light gray)
+  - [x] Clear highlights when simulation ends
 
 ### Demo Checklist
 - [ ] Create simple flow (5-6 nodes, 1-2 decisions)
@@ -911,6 +911,233 @@ Phase 5 Step 3 Completion Notes (2024-12-27):
 - All tests passing successfully
 - Simulation engine ready for UI integration (Phase 5 Step 4)
 - Ready for Phase 5 Step 4: Simulation UI Controls
+
+Phase 5 Step 4 Completion Notes (2024-12-27):
+- Created useSimulation hook (src/hooks/useSimulation.js):
+  * Manages simulation state and playback controls
+  * Auto-runs simulation when example case changes
+  * Handles play, pause, step forward/back, reset operations
+  * Speed control with configurable playback rate (0.5x to 3x)
+  * Tracks current step index and progress
+  * Uses setInterval for auto-play with speed-adjusted delays
+  * Cleans up intervals on unmount or state changes
+  * Returns comprehensive state and control functions
+
+- Created SimulationPanel component (src/components/SimulationPanel.jsx):
+  * Full-featured simulation control UI
+  * Success/error state indicators
+  * Progress indicator: "Step X of Y" with percentage bar
+  * Current step information display:
+    - Node name and type
+    - Condition evaluation results
+    - Visual badges for node types
+  * Playback controls:
+    - Reset button (↻) - Returns to first step
+    - Step Back button (⏮) - Previous step
+    - Play/Pause button - Auto-advance or stop
+    - Step Forward button (⏭) - Next step
+    - Disabled states when at start/end
+  * Speed slider:
+    - Range: 0.5x to 3.0x
+    - Step: 0.5x increments
+    - Visual markers at each increment
+    - Real-time speed display (e.g., "2.0x")
+  * Execution path visualization:
+    - Shows all nodes in path
+    - Current node highlighted in blue
+    - Past nodes in green
+    - Future nodes in gray
+    - Node labels displayed in badges
+  * Error handling:
+    - Displays simulation errors in red panel
+    - Shows error icon and message
+    - Graceful failure state
+
+- Updated ExampleCasesList component:
+  * Added "Run Simulation" button to each case card
+  * Button with Play icon and prominent styling
+  * Triggers simulation mode when clicked
+  * Hidden during delete confirmation
+
+- Updated Sidebar component:
+  * Added edges prop to enable simulation
+  * State management for selected case (selectedCaseForSimulation)
+  * Conditional rendering:
+    - Shows case list by default
+    - Shows simulation panel when case selected
+  * "Back to Cases" button in simulation view
+  * Case name and description in simulation header
+  * Passes exampleCase, nodes, edges to SimulationPanel
+
+- Updated App.jsx:
+  * Added edges prop to Sidebar component
+  * Full data flow for simulation functionality
+
+- Simulation controls functionality:
+  * Play: Starts auto-advancing through steps
+    - Base delay: 1000ms per step
+    - Adjusted by speed multiplier
+    - Auto-stops at end of simulation
+    - If at end, restarts from beginning
+  * Pause: Stops auto-advancement
+    - Clears interval timer
+    - Preserves current step position
+  * Step Forward: Advances one step
+    - Disabled at end of simulation
+    - Stops auto-play if active
+  * Step Back: Goes back one step
+    - Disabled at start of simulation
+    - Stops auto-play if active
+  * Reset: Returns to first step
+    - Disabled at start
+    - Resets step index to 0
+  * Speed Slider: Adjusts playback speed
+    - 0.5x = 2000ms per step (slow)
+    - 1.0x = 1000ms per step (normal)
+    - 2.0x = 500ms per step (fast)
+    - 3.0x = 333ms per step (very fast)
+    - Works during active playback
+
+- Progress tracking:
+  * Current step number (1-based for display)
+  * Total steps in simulation
+  * Percentage complete
+  * Visual progress bar with smooth transitions
+
+- User experience enhancements:
+  * Disabled button states prevent invalid actions
+  * Visual feedback for current/past/future steps
+  * Color-coded states (blue=current, green=past, gray=future)
+  * Smooth transitions and animations
+  * Consistent theming with CSS custom properties
+  * Loading state while computing simulation
+  * Clear error messages with visual indicators
+
+- All Phase 5 Step 4 requirements completed and tested
+- Dev server running successfully on port 5173
+- Ready for Phase 5 Step 5: Path Highlighting
+
+Phase 5 Step 5 Completion Notes (2024-12-27):
+- Created CSS animations in index.css:
+  * @keyframes pulse-node: Pulsing box-shadow effect (0-8px spread)
+  * @keyframes pulse-border: Pulsing border color (full to 50% opacity)
+  * .simulation-active-node class:
+    - Dual animations (pulse-node + pulse-border)
+    - 3px solid blue border (#3b82f6)
+    - Blue glow box-shadow (0 0 20px rgba(59, 130, 246, 0.6))
+    - 2s ease-in-out infinite
+  * .simulation-past-node class:
+    - 2px solid green border (#10b981)
+    - Green background overlay (rgba(16, 185, 129, 0.1))
+    - 80% opacity
+  * .simulation-upcoming-node class:
+    - 1px dashed gray border (#94a3b8)
+    - 50% opacity
+
+- Created simulationHighlighting.js utility (src/utils/simulationHighlighting.js):
+  * applySimulationStylesToNodes(nodes, simulationState):
+    - Applies CSS classes based on node state
+    - Active node: simulation-active-node
+    - Past nodes: simulation-past-node
+    - Upcoming nodes: simulation-upcoming-node
+    - Cleans up classes when no simulation active
+  * applySimulationStylesToEdges(edges, simulationState):
+    - Active edge: Blue (#3b82f6), 4px width, animated
+    - Past edges: Green (#10b981), 3px width, not animated
+    - Upcoming edges: Gray (#94a3b8), 2px width, dashed (5,5), not animated
+    - Stores default values for restoration
+    - Cleans up when no simulation active
+  * clearSimulationStyles(nodes, edges):
+    - Helper to clear all simulation styles
+    - Returns nodes and edges with default styles
+
+- Updated useSimulation hook:
+  * Added simulationState export:
+    - isActive: boolean (true when simulation running)
+    - currentStepIndex: Current step number
+    - path: Array of node IDs in execution order
+    - steps: Full step data with details
+    - currentNodeId: ID of active node
+  * Returns null when no simulation or simulation failed
+  * Used by highlighting utilities
+
+- Updated SimulationPanel component:
+  * Added onSimulationStateChange prop callback
+  * useEffect to notify parent of state changes
+  * Imported React for useEffect
+  * Propagates simulationState up component tree
+
+- Updated Sidebar component:
+  * Added onSimulationStateChange prop
+  * handleSimulationStateChange callback
+  * Passes callback to SimulationPanel
+  * Propagates state changes to parent (App)
+
+- Updated App.jsx:
+  * Added simulationState state variable
+  * Added handleSimulationStateChange handler
+  * Passed simulationState through DiagramContent
+  * Passed onSimulationStateChange to Sidebar
+  * Passed simulationState to Canvas
+  * Complete data flow: SimulationPanel → Sidebar → App → Canvas
+
+- Updated Canvas component:
+  * Imported applySimulationStylesToNodes and applySimulationStylesToEdges
+  * Added simulationState prop
+  * useMemo for highlightedNodes:
+    - Applies simulation classes dynamically
+    - Recalculates when nodes or simulationState change
+  * useMemo for highlightedEdges:
+    - Applies edge styles dynamically
+    - Recalculates when edges or simulationState change
+  * Passes highlighted nodes/edges to ReactFlow
+  * Performance optimized with memoization
+
+- Highlighting behavior:
+  * Active node (current step):
+    - Thick pulsing blue border (3px)
+    - Blue glow effect (20px spread)
+    - Pulsing animation (2s cycle)
+    - Most prominent visual
+  * Past nodes (already visited):
+    - Green border (2px solid)
+    - Light green background tint
+    - Slightly dimmed (80% opacity)
+  * Upcoming nodes (not yet reached):
+    - Dashed gray border (1px)
+    - Reduced opacity (50%)
+    - Preview of path ahead
+  * Active edge (just taken):
+    - Bright blue color (#3b82f6)
+    - Thicker stroke (4px)
+    - Animated flow
+  * Past edges (already traversed):
+    - Green color (#10b981)
+    - Medium stroke (3px)
+    - Static (not animated)
+  * Upcoming edges (will be taken):
+    - Gray color (#94a3b8)
+    - Normal stroke (2px)
+    - Dashed stroke (5px dash, 5px gap)
+    - Preview of upcoming path
+
+- Dynamic updates:
+  * Highlights update in real-time as simulation progresses
+  * Play/pause/step controls update highlighting immediately
+  * Smooth transitions between states
+  * No performance issues with memoization
+
+- Cleanup:
+  * Highlights automatically cleared when:
+    - Simulation ends
+    - User navigates back to cases list
+    - simulationState becomes null
+  * Nodes/edges return to default styles
+  * CSS classes removed properly
+
+- All Phase 5 Step 5 requirements completed
+- Dev server running successfully on port 5173
+- Phase 5 complete! Ready for Phase 6: Advanced Simulation Features
 ```
 
 ---

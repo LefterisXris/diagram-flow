@@ -8,14 +8,36 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 DiagramFlow is an interactive flow diagram tool for developers and architects. Create system diagrams with conditional logic, define example cases with real data, and simulate how data flows through your system step-by-step.
 
-**Key Features**:
-- Interactive flow diagrams with conditional branching
-- Example cases with simulation and step-through debugging
-- Rich metadata support for nodes (tech stack, owners, links)
-- Mermaid-to-DiagramFlow migration tool
-- 100% client-side (no backend server)
-- VCS-friendly JSON export/import
-- Pet Clinic template for onboarding
+**Current Progress**: 60% Complete (Phases 0-5 Done, 6-9 Remaining)
+
+**Implemented Features** (Phases 0-5):
+- ✅ Interactive flow diagrams with drag & drop
+- ✅ Multiple node types (Service, Database, Client, Decision, Generic)
+- ✅ Rich metadata support (descriptions, tags, owners, links, status, version)
+- ✅ Icon library with 700+ Lucide icons
+- ✅ Conditional branching with decision nodes
+- ✅ Conditional edges with expression evaluation (expr-eval)
+- ✅ Example case manager (create, edit, delete test cases)
+- ✅ Flow simulation engine with step-by-step execution
+- ✅ Playback controls (play, pause, step, reset, speed 0.5x-3x)
+- ✅ Real-time path highlighting (active, past, upcoming nodes/edges)
+- ✅ Pulsing animations for active nodes
+- ✅ Session management with cookies
+- ✅ Save/load multiple diagrams
+- ✅ VCS-friendly JSON export/import
+- ✅ Mermaid flowchart import
+- ✅ Dark/light theme system
+- ✅ Auto-save with 30-second debounce
+- ✅ 100% client-side (no backend server)
+
+**Coming Soon** (Phases 6-9):
+- 🔜 Data transformation tracking
+- 🔜 Data inspector panel with diff view
+- 🔜 Conditional evaluation display
+- 🔜 Multiple case comparison
+- 🔜 Pet Clinic template for onboarding
+- 🔜 Advanced search and validation
+- 🔜 Export formats (PNG, SVG, HTML)
 
 ## Development Commands
 
@@ -102,40 +124,67 @@ User: "implement phase 0 step 1"
 ```
 diagramflow/
 ├── src/
-│   ├── components/       # React components
-│   │   ├── nodes/       # Custom node types
-│   │   ├── Header.jsx
-│   │   ├── Sidebar.jsx
-│   │   ├── Canvas.jsx
-│   │   └── ThemeToggle.jsx
-│   ├── contexts/        # React contexts
+│   ├── components/               # React components
+│   │   ├── nodes/               # Custom node types (5 types)
+│   │   │   ├── GenericNode.jsx
+│   │   │   ├── ServiceNode.jsx
+│   │   │   ├── DatabaseNode.jsx
+│   │   │   ├── ClientNode.jsx
+│   │   │   └── DecisionNode.jsx
+│   │   ├── Header.jsx           # Top navigation bar
+│   │   ├── Sidebar.jsx          # Left tool panel with tabs
+│   │   ├── Canvas.jsx           # React Flow canvas
+│   │   ├── ThemeToggle.jsx      # Theme switcher
+│   │   ├── IconPicker.jsx       # Icon library picker
+│   │   ├── NodeDetailPanel.jsx  # Node metadata editor
+│   │   ├── EdgeConditionPanel.jsx # Edge condition editor
+│   │   ├── ExampleCaseForm.jsx  # Create/edit case modal
+│   │   ├── ExampleCasesList.jsx # List of test cases
+│   │   ├── SimulationPanel.jsx  # Simulation controls
+│   │   ├── SaveDiagramDialog.jsx # Save dialog
+│   │   ├── OpenDiagramDialog.jsx # Load dialog
+│   │   └── MermaidImportDialog.jsx # Mermaid import
+│   ├── contexts/                # React contexts
 │   │   ├── ThemeContext.jsx
 │   │   └── ThemeContextDef.js
-│   ├── hooks/           # Custom hooks
+│   ├── hooks/                   # Custom hooks
 │   │   ├── useTheme.js
-│   │   └── useDiagramState.js
-│   ├── themes/          # Theme definitions
+│   │   ├── useDiagramState.js
+│   │   ├── useSimulation.js
+│   │   └── useSession.js
+│   ├── themes/                  # Theme definitions
 │   │   └── index.js
-│   ├── config/          # Configuration
+│   ├── config/                  # Configuration
 │   │   └── nodeTypes.js
-│   ├── templates/       # Diagram templates
-│   │   └── petClinic.js
+│   ├── utils/                   # Utility functions
+│   │   ├── diagramLibrary.js    # Save/load diagrams
+│   │   ├── exportDiagram.js     # Export to JSON
+│   │   ├── importDiagram.js     # Import from JSON
+│   │   ├── mermaidImport.js     # Mermaid parser
+│   │   ├── edgeConditions.js    # Edge condition utilities
+│   │   ├── exampleCases.js      # Case normalization
+│   │   ├── simulationEngine.js  # Flow execution engine
+│   │   └── simulationHighlighting.js # Visual highlighting
+│   ├── templates/               # Diagram templates
+│   │   └── petClinic.js         # Pet Clinic example (future)
 │   ├── App.jsx
 │   ├── main.jsx
-│   └── index.css
-├── architect.md         # Requirements document (READ BEFORE IMPLEMENTING)
-├── plan.md             # Implementation plan
-├── tasks.md            # Task tracker
-├── name.md             # Branding and SEO strategy
+│   └── index.css                # Global styles + animations
+├── architect.md                 # Requirements document (READ BEFORE IMPLEMENTING)
+├── plan.md                      # Implementation plan
+├── tasks.md                     # Task tracker
+├── name.md                      # Branding and SEO strategy
+├── CLAUDE.md                    # This file
 └── implementation-phase*-step*.md  # Implementation templates
 
 ## Core Technologies
 
-- **React 19** - UI framework
-- **React Flow 11** - Interactive diagrams
-- **Vite** - Build tool and dev server
-- **Tailwind CSS v4** - Utility-first CSS framework
-- **Lucide React** - Icon library
+- **React 19** - UI framework with latest features
+- **React Flow 11** - Interactive node-based diagrams
+- **Vite 7** - Lightning-fast build tool and dev server
+- **Tailwind CSS v4** - Utility-first CSS framework (@next version)
+- **Lucide React** - Icon library (700+ icons)
+- **expr-eval** - Safe expression evaluation for conditional logic
 - **js-cookie** - Cookie management for sessions
 
 ## Theme System
@@ -150,10 +199,15 @@ DiagramFlow uses CSS custom properties for theming:
 
 ## State Management
 
-- **Diagram State**: `useDiagramState` hook manages nodes, edges, and auto-save
-- **Session State**: Cookie-based sessions with localStorage persistence
-- **Theme State**: ThemeContext for dark/light mode
-- **Persistence**: localStorage for diagrams, sessionStorage for undo/redo
+- **Diagram State**: `useDiagramState` hook manages nodes, edges, example cases, and auto-save
+- **Simulation State**: `useSimulation` hook manages playback controls and highlighting
+- **Session State**: `useSession` hook with cookie-based sessions and localStorage persistence
+- **Theme State**: `useTheme` hook via ThemeContext for dark/light mode
+- **Persistence**:
+  - localStorage for diagrams (`diagram_current`, `diagram_<id>`, `diagram_list`)
+  - localStorage for theme (`diagram_theme`)
+  - sessionStorage for undo/redo (future feature)
+  - cookies for session management
 
 ## Important Notes
 
@@ -164,3 +218,55 @@ DiagramFlow uses CSS custom properties for theming:
 - **Architect.md First**: Always read architect.md sections before implementing
 - **Tailwind v4**: Use @next version with CSS imports
 - **React Flow v11**: Not v10 - API differences exist
+- **expr-eval**: Used for safe conditional evaluation (no eval())
+- **Simulation**: Uses CSS animations for pulsing effects
+- **Memoization**: Heavy use of useMemo for performance (highlighting, node types)
+
+## Key Features Summary
+
+### Completed (Phases 0-5)
+
+**Phase 0**: Foundation & Setup
+- Vite + React 19 setup
+- Tailwind CSS v4 integration
+- Theme system (dark/light)
+- UI layout (Header, Sidebar, Canvas)
+
+**Phase 1**: Basic Node & Edge Management
+- Interactive node creation
+- Edge connections with drag & drop
+- State persistence with auto-save
+
+**Phase 2**: Node Types & Rich Metadata
+- 5 node types with custom styling
+- Icon library with 700+ icons
+- Metadata editor (descriptions, tags, links)
+- Node detail panel
+
+**Phase 3**: State Persistence & File Management
+- Session management
+- Save/load multiple diagrams
+- JSON export/import
+- Mermaid flowchart import
+
+**Phase 4**: Conditional Nodes & Branching Logic
+- Decision node type
+- Conditional edge editor
+- Expression evaluation with expr-eval
+- Visual condition indicators
+
+**Phase 5**: Example Cases & Flow Simulation
+- Example case manager UI
+- Simulation engine with step-by-step execution
+- Playback controls (play, pause, step, reset, speed)
+- Real-time path highlighting
+- Pulsing animations for active nodes
+
+### In Development (Phase 6)
+
+**Phase 6**: Advanced Simulation Features
+- Data transformation tracking
+- Data inspector panel
+- Conditional evaluation display
+- Multiple case comparison
+- Simulation history
