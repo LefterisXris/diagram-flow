@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNodesState, useEdgesState } from "reactflow";
+import { normalizeConditionalEdge } from "../utils/edgeConditions";
 
 const STORAGE_KEY = "diagram_current";
 const AUTOSAVE_DELAY = 30000; // 30 seconds
@@ -16,8 +17,9 @@ export const useDiagramState = () => {
     if (saved) {
       try {
         const { nodes: savedNodes, edges: savedEdges } = JSON.parse(saved);
+        const normalizedEdges = (savedEdges || []).map((edge) => normalizeConditionalEdge(edge));
         setNodes(savedNodes || []);
-        setEdges(savedEdges || []);
+        setEdges(normalizedEdges);
         setIsDirty(false);
       } catch (e) {
         console.error("Failed to load diagram:", e);

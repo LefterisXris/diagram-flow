@@ -3,6 +3,8 @@
  * Validates structure and loads into React Flow
  */
 
+import { normalizeConditionalEdge } from "./edgeConditions";
+
 /**
  * Validate the imported JSON structure
  * @param {Object} data - Parsed JSON data
@@ -96,7 +98,7 @@ const convertNodeToReactFlow = (nodeData) => {
  * @returns {Object} - React Flow edge object
  */
 const convertEdgeToReactFlow = (edgeData) => {
-  return {
+  return normalizeConditionalEdge({
     id: edgeData.id,
     source: edgeData.source,
     target: edgeData.target,
@@ -104,8 +106,9 @@ const convertEdgeToReactFlow = (edgeData) => {
     animated: edgeData.animated || false,
     type: edgeData.type || "default",
     style: edgeData.style || {},
+    data: edgeData.data || {},
     metadata: edgeData.metadata || {},
-  };
+  });
 };
 
 /**

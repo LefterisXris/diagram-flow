@@ -673,37 +673,37 @@ Phase 3 Step 6 Completion Notes (2024-12-27):
 **Deliverable**: Decision nodes with multiple outputs, condition definitions, visual indicators
 
 ### Tasks
-- [ ] **Create Decision Node Component**
-  - [ ] Design diamond-shaped node (CSS or SVG)
-  - [ ] Special handles: 1 input (top), 2+ outputs (sides/bottom)
-  - [ ] Add label in center
-  - [ ] Apply distinct color scheme (yellow/orange)
+- [x] **Create Decision Node Component**
+  - [x] Design diamond-shaped node (CSS or SVG)
+  - [x] Special handles: 1 input (top), 2+ outputs (sides/bottom)
+  - [x] Add label in center
+  - [x] Apply distinct color scheme (yellow/orange)
 
-- [ ] **Implement Conditional Edges**
-  - [ ] Extend edge data model with condition fields
-  - [ ] Add `condition` field (expression string)
-  - [ ] Add `priority` field (evaluation order)
-  - [ ] Add `conditionType` (true/false/default)
-  - [ ] Color-code edges: green (true), red (false), gray (default)
+- [x] **Implement Conditional Edges**
+  - [x] Extend edge data model with condition fields
+  - [x] Add `condition` field (expression string)
+  - [x] Add `priority` field (evaluation order)
+  - [x] Add `conditionType` (true/false/default)
+  - [x] Color-code edges: green (true), red (false), gray (default)
 
-- [ ] **Create Condition Editor UI**
-  - [ ] Show condition panel when edge from decision node selected
-  - [ ] Input field for condition expression
-  - [ ] Priority number input
-  - [ ] Condition type dropdown
+- [x] **Create Condition Editor UI**
+  - [x] Show condition panel when edge from decision node selected
+  - [x] Input field for condition expression
+  - [x] Priority number input
+  - [x] Condition type dropdown
   - [ ] Add syntax helper/validator
 
-- [ ] **Visual Indicators for Conditions**
-  - [ ] Display condition label on edges
-  - [ ] Style edges based on condition type (solid/dashed, colors)
-  - [ ] Show badge on decision node (number of conditions)
+- [x] **Visual Indicators for Conditions**
+  - [x] Display condition label on edges
+  - [x] Style edges based on condition type (solid/dashed, colors)
+  - [x] Show badge on decision node (number of conditions)
   - [ ] Add validation warnings
 
 - [ ] **Implement Multiple Outputs**
-  - [ ] Allow 2+ edges from decision node
-  - [ ] Validate: at least 1 true path
-  - [ ] Show warning if no default path
-  - [ ] Highlight all paths on decision node hover
+  - [x] Allow 2+ edges from decision node
+  - [x] Validate: at least 1 true path
+  - [x] Show warning if no default path
+  - [x] Highlight all paths on decision node hover
 
 ### Demo Checklist
 - [ ] Create workflow with 2-3 decision nodes

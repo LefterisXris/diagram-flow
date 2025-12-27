@@ -2,8 +2,21 @@ import { useCallback, useMemo } from "react";
 import ReactFlow, { Background, Controls, addEdge, useReactFlow } from "reactflow";
 import "reactflow/dist/style.css";
 import { nodeTypes } from "../config/nodeTypes";
+import { createConditionalEdgeData, normalizeConditionalEdge } from "../utils/edgeConditions";
 
-const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeClick, setEdges }) => {
+const Canvas = ({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onAddNode,
+  onNodeClick,
+  onEdgeClick,
+  onPaneClick,
+  onNodeMouseEnter,
+  onNodeMouseLeave,
+  setEdges,
+}) => {
   const { screenToFlowPosition } = useReactFlow();
 
   // Handle double-click to create node
@@ -18,14 +31,21 @@ const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeC
 
   // Handle edge creation
   const onConnect = useCallback((params) => {
-    const newEdge = {
+    const sourceNode = nodes.find((node) => node.id === params.source);
+    const isDecisionSource = sourceNode?.type === "decision";
+    const edgeData = createConditionalEdgeData({
+      conditionType: isDecisionSource ? "true" : "",
+    });
+
+    const newEdge = normalizeConditionalEdge({
       ...params,
       id: crypto.randomUUID(),
       animated: true,
       type: "smoothstep",
-    };
+      data: edgeData,
+    });
     setEdges((eds) => addEdge(newEdge, eds));
-  }, [setEdges]);
+  }, [nodes, setEdges]);
 
   // Memoize nodeTypes to prevent recreation
   const memoizedNodeTypes = useMemo(() => nodeTypes, []);
@@ -47,6 +67,10 @@ const Canvas = ({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onNodeC
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
+        onPaneClick={onPaneClick}
+        onNodeMouseEnter={onNodeMouseEnter}
+        onNodeMouseLeave={onNodeMouseLeave}
         nodeTypes={memoizedNodeTypes}
         fitView
         style={{ backgroundColor: "var(--bg-primary)" }}
