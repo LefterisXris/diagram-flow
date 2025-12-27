@@ -1,8 +1,17 @@
-import React from 'react';
-import { Play, Pause, SkipBack, SkipForward, RotateCcw, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, AlertCircle, CheckCircle, XCircle, PlayCircle, List } from 'lucide-react';
 import { useSimulation } from '../hooks/useSimulation';
+import { simulateFlow } from '../utils/simulationEngine';
 
-const SimulationPanel = ({ exampleCase, nodes, edges, onSimulationStateChange }) => {
+const SimulationPanel = ({ exampleCases, selectedCaseId, nodes, edges, onSimulationStateChange, onCaseChange, onSimulationComplete }) => {
+  // State for batch mode
+  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [batchResults, setBatchResults] = useState([]);
+  const [currentBatchIndex, setCurrentBatchIndex] = useState(0);
+  const [simulationStartTime, setSimulationStartTime] = useState(null);
+
+  // Get the currently selected case
+  const exampleCase = exampleCases?.find(c => c.id === selectedCaseId) || exampleCases?.[0];
   const {
     simulationResult,
     currentStep,
@@ -29,6 +38,104 @@ const SimulationPanel = ({ exampleCase, nodes, edges, onSimulationStateChange })
       onSimulationStateChange(simulationState);
     }
   }, [simulationState, onSimulationStateChange]);
+
+  // Batch mode: Run all cases when batch mode is activated
+  useEffect(() => {
+    if (isBatchMode && exampleCases && exampleCases.length > 0 && nodes && edges) {
+      // Run simulation for each case
+      const results = exampleCases.map(caseItem => {
+        // Run simulation for this specific case
+        const result = simulateFlow(caseItem, nodes, edges);
+        const actualPath = result?.path || [];
+        const expectedPath = caseItem.expectedPath || [];
+
+        // Check if paths match
+        const pathsMatch = actualPath.length === expectedPath.length &&
+          actualPath.every((nodeId, index) => nodeId === expectedPath[index]);
+
+        return {
+          caseId: caseItem.id,
+          caseName: caseItem.name,
+          success: result?.success || false,
+          pathMatches: pathsMatch,
+          actualPath,
+          expectedPath,
+          error: result?.error,
+        };
+      });
+
+      setBatchResults(results);
+    } else if (!isBatchMode) {
+      setBatchResults([]);
+    }
+  }, [isBatchMode, exampleCases, nodes, edges]);
+
+  // Track simulation start time when simulation begins
+  useEffect(() => {
+    if (simulationResult && !isBatchMode) {
+      setSimulationStartTime(Date.now());
+    }
+  }, [simulationResult, isBatchMode]);
+
+  // Track when simulation reaches the end and add to history
+  useEffect(() => {
+    if (
+      !isBatchMode &&
+      simulationResult?.success &&
+      isAtEnd &&
+      exampleCase &&
+      simulationStartTime &&
+      onSimulationComplete
+    ) {
+      const duration = Date.now() - simulationStartTime;
+      const actualPath = simulationResult.path || [];
+      const expectedPath = exampleCase.expectedPath || [];
+      const pathsMatch = actualPath.length === expectedPath.length &&
+        actualPath.every((nodeId, index) => nodeId === expectedPath[index]);
+
+      onSimulationComplete({
+        caseId: exampleCase.id,
+        caseName: exampleCase.name,
+        actualPath,
+        expectedPath,
+        success: simulationResult.success,
+        pathMatches: pathsMatch,
+        duration,
+        inputData: exampleCase.input?.data || {},
+      });
+
+      // Reset start time to avoid duplicate history entries
+      setSimulationStartTime(null);
+    }
+  }, [isAtEnd, simulationResult, exampleCase, isBatchMode, simulationStartTime, onSimulationComplete]);
+
+  // Handle case selector change
+  const handleCaseChange = (caseId) => {
+    if (onCaseChange) {
+      onCaseChange(caseId);
+    }
+    setIsBatchMode(false);
+  };
+
+  // Start batch mode
+  const handleRunAllCases = () => {
+    setIsBatchMode(true);
+    setCurrentBatchIndex(0);
+  };
+
+  // Exit batch mode
+  const handleExitBatchMode = () => {
+    setIsBatchMode(false);
+    setBatchResults([]);
+    setCurrentBatchIndex(0);
+  };
+
+  // Calculate pass/fail summary
+  const batchSummary = batchResults.length > 0 ? {
+    total: batchResults.length,
+    passed: batchResults.filter(r => r.success && r.pathMatches).length,
+    failed: batchResults.filter(r => !r.success || !r.pathMatches).length,
+  } : null;
 
   // Show loading state while simulation is being computed
   if (!simulationResult) {
@@ -71,22 +178,157 @@ const SimulationPanel = ({ exampleCase, nodes, edges, onSimulationStateChange })
   // Render successful simulation controls
   return (
     <div className="p-4 space-y-4">
-      {/* Success indicator */}
-      <div
-        className="p-3 rounded-lg border-l-4 flex items-center gap-2"
-        style={{
-          backgroundColor: 'rgba(16, 185, 129, 0.05)',
-          borderColor: '#10b981',
-        }}
-      >
-        <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />
-        <span className="text-sm font-medium" style={{ color: '#10b981' }}>
-          Simulation Ready
-        </span>
-      </div>
+      {/* Case selector dropdown */}
+      {exampleCases && exampleCases.length > 1 && !isBatchMode && (
+        <div className="space-y-2">
+          <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+            Example Case
+          </label>
+          <select
+            value={selectedCaseId || exampleCase?.id}
+            onChange={(e) => handleCaseChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border transition-colors"
+            style={{
+              backgroundColor: 'var(--bg-primary)',
+              borderColor: 'var(--border-primary)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            {exampleCases.map(caseItem => (
+              <option key={caseItem.id} value={caseItem.id}>
+                {caseItem.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
-      {/* Progress indicator */}
-      {progress && (
+      {/* Run All Cases button */}
+      {exampleCases && exampleCases.length > 1 && !isBatchMode && (
+        <button
+          onClick={handleRunAllCases}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium"
+          style={{
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderColor: '#8b5cf6',
+            border: '1px solid',
+            color: '#8b5cf6',
+          }}
+        >
+          <PlayCircle className="w-4 h-4" />
+          Run All {exampleCases.length} Cases
+        </button>
+      )}
+
+      {/* Batch mode summary */}
+      {isBatchMode && batchSummary && (
+        <div className="space-y-3">
+          <div
+            className="p-4 rounded-lg border-l-4"
+            style={{
+              backgroundColor: batchSummary.passed === batchSummary.total
+                ? 'rgba(16, 185, 129, 0.05)'
+                : 'rgba(239, 68, 68, 0.05)',
+              borderColor: batchSummary.passed === batchSummary.total ? '#10b981' : '#ef4444',
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Batch Results
+              </h3>
+              <button
+                onClick={handleExitBatchMode}
+                className="text-xs px-2 py-1 rounded transition-colors"
+                style={{
+                  backgroundColor: 'var(--bg-primary)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                ← Back
+              </button>
+            </div>
+
+            <div className="text-2xl font-bold mb-2" style={{
+              color: batchSummary.passed === batchSummary.total ? '#10b981' : '#ef4444'
+            }}>
+              {batchSummary.passed} of {batchSummary.total} cases passed
+            </div>
+
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />
+                <span style={{ color: '#10b981' }}>{batchSummary.passed} passed</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <XCircle className="w-4 h-4" style={{ color: '#ef4444' }} />
+                <span style={{ color: '#ef4444' }}>{batchSummary.failed} failed</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Individual case results */}
+          <div className="space-y-2">
+            <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
+              Case Results
+            </div>
+            {batchResults.map((result, index) => {
+              const passed = result.success && result.pathMatches;
+              return (
+                <div
+                  key={result.caseId}
+                  className="p-3 rounded-lg border flex items-center justify-between"
+                  style={{
+                    backgroundColor: 'var(--bg-primary)',
+                    borderColor: passed ? '#10b981' : '#ef4444',
+                  }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      {passed ? (
+                        <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#10b981' }} />
+                      ) : (
+                        <XCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#ef4444' }} />
+                      )}
+                      <span className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                        {result.caseName}
+                      </span>
+                    </div>
+                    {!result.pathMatches && result.success && (
+                      <div className="text-xs mt-1 ml-6" style={{ color: '#ef4444' }}>
+                        Path mismatch: Expected {result.expectedPath.length} nodes, got {result.actualPath.length}
+                      </div>
+                    )}
+                    {!result.success && (
+                      <div className="text-xs mt-1 ml-6" style={{ color: '#ef4444' }}>
+                        Simulation failed
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Success indicator - only show when not in batch mode */}
+      {!isBatchMode && (
+        <div
+          className="p-3 rounded-lg border-l-4 flex items-center gap-2"
+          style={{
+            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+            borderColor: '#10b981',
+          }}
+        >
+          <CheckCircle className="w-4 h-4" style={{ color: '#10b981' }} />
+          <span className="text-sm font-medium" style={{ color: '#10b981' }}>
+            Simulation Ready
+          </span>
+        </div>
+      )}
+
+      {/* Progress indicator - only show when not in batch mode */}
+      {!isBatchMode && progress && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
@@ -111,8 +353,8 @@ const SimulationPanel = ({ exampleCase, nodes, edges, onSimulationStateChange })
         </div>
       )}
 
-      {/* Current step info */}
-      {currentStep && (
+      {/* Current step info - only show when not in batch mode */}
+      {!isBatchMode && currentStep && (
         <div
           className="p-3 rounded-lg border"
           style={{
@@ -153,7 +395,8 @@ const SimulationPanel = ({ exampleCase, nodes, edges, onSimulationStateChange })
         </div>
       )}
 
-      {/* Playback controls */}
+      {/* Playback controls - only show when not in batch mode */}
+      {!isBatchMode && (
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           {/* Reset button */}
@@ -301,6 +544,8 @@ const SimulationPanel = ({ exampleCase, nodes, edges, onSimulationStateChange })
           })}
         </div>
       </div>
+      </div>
+      )}
     </div>
   );
 };

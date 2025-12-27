@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Plus, Box, Server, Database, Monitor, GitBranch, Wrench, FlaskConical, Play } from "lucide-react";
+import { Plus, Box, Server, Database, Monitor, GitBranch, Wrench, FlaskConical, Play, History } from "lucide-react";
 import * as Icons from "lucide-react";
 import IconPicker from "./IconPicker";
 import ExampleCasesList from "./ExampleCasesList";
 import ExampleCaseForm from "./ExampleCaseForm";
 import SimulationPanel from "./SimulationPanel";
+import SimulationHistory from "./SimulationHistory";
 
 const nodeTypeOptions = [
   { type: "generic", label: "Generic", icon: Box, color: "#3b82f6" },
@@ -17,6 +18,7 @@ const nodeTypeOptions = [
 const tabs = [
   { id: "tools", label: "Tools", icon: Wrench },
   { id: "cases", label: "Example Cases", icon: FlaskConical },
+  { id: "history", label: "History", icon: History },
 ];
 
 const Sidebar = ({
@@ -28,6 +30,11 @@ const Sidebar = ({
   nodes = [],
   edges = [],
   onSimulationStateChange,
+  simulationHistory = [],
+  onReplaySimulation,
+  onDeleteHistoryItem,
+  onClearHistory,
+  onSimulationComplete,
 }) => {
   const [activeTab, setActiveTab] = useState("tools");
   const [selectedType, setSelectedType] = useState("generic");
@@ -74,6 +81,20 @@ const Sidebar = ({
 
   const handleDeleteCase = (caseId) => {
     onDeleteExampleCase(caseId);
+  };
+
+  // Handle replay from history
+  const handleReplayFromHistory = (historyItem) => {
+    // Find the case
+    const caseToReplay = exampleCases.find(c => c.id === historyItem.caseId);
+    if (caseToReplay) {
+      // Switch to cases tab and run simulation
+      setActiveTab('cases');
+      setSelectedCaseForSimulation(caseToReplay);
+    } else if (onReplaySimulation) {
+      // Fallback to parent handler if case not found
+      onReplaySimulation(historyItem);
+    }
   };
 
   // Get the icon component for display
@@ -228,20 +249,24 @@ const Sidebar = ({
                         ← Back to Cases
                       </button>
                       <h3 className="font-semibold mt-1" style={{ color: "var(--text-primary)" }}>
-                        {selectedCaseForSimulation.name}
+                        Simulation Mode
                       </h3>
-                      {selectedCaseForSimulation.description && (
-                        <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
-                          {selectedCaseForSimulation.description}
-                        </p>
-                      )}
+                      <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                        {exampleCases.length} case{exampleCases.length !== 1 ? 's' : ''} available
+                      </p>
                     </div>
                   </div>
                   <SimulationPanel
-                    exampleCase={selectedCaseForSimulation}
+                    exampleCases={exampleCases}
+                    selectedCaseId={selectedCaseForSimulation?.id}
                     nodes={nodes}
                     edges={edges}
                     onSimulationStateChange={handleSimulationStateChange}
+                    onCaseChange={(caseId) => {
+                      const newCase = exampleCases.find(c => c.id === caseId);
+                      setSelectedCaseForSimulation(newCase);
+                    }}
+                    onSimulationComplete={onSimulationComplete}
                   />
                 </div>
               ) : (
@@ -273,6 +298,18 @@ const Sidebar = ({
                   />
                 </div>
               )}
+            </div>
+          )}
+
+          {activeTab === "history" && (
+            <div className="p-4">
+              <SimulationHistory
+                history={simulationHistory}
+                onReplay={handleReplayFromHistory}
+                onDelete={onDeleteHistoryItem}
+                onClear={onClearHistory}
+                nodes={nodes}
+              />
             </div>
           )}
         </div>

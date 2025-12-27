@@ -12,6 +12,7 @@ import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
 import { useDiagramState } from "./hooks/useDiagramState";
 import { useSession } from "./hooks/useSession";
+import { useSimulationHistory } from "./hooks/useSimulationHistory";
 import { exportDiagram } from "./utils/exportDiagram";
 import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
@@ -53,6 +54,11 @@ function DiagramContent({
   triggerAutoSave,
   simulationState,
   onSimulationStateChange,
+  simulationHistory,
+  onReplaySimulation,
+  onDeleteHistoryItem,
+  onClearHistory,
+  onSimulationComplete,
 }) {
   const { getViewport, setViewport } = useReactFlow();
 
@@ -120,6 +126,11 @@ function DiagramContent({
           nodes={nodes}
           edges={edges}
           onSimulationStateChange={onSimulationStateChange}
+          simulationHistory={simulationHistory}
+          onReplaySimulation={onReplaySimulation}
+          onDeleteHistoryItem={onDeleteHistoryItem}
+          onClearHistory={onClearHistory}
+          onSimulationComplete={onSimulationComplete}
         />
         <Canvas
           nodes={nodes}
@@ -213,8 +224,36 @@ function App() {
   const [pendingViewport, setPendingViewport] = useState(null);
   const [simulationState, setSimulationState] = useState(null);
 
+  // Simulation history tracking
+  const {
+    history: simulationHistory,
+    addToHistory,
+    clearHistory,
+    deleteHistoryItem,
+  } = useSimulationHistory(currentDiagramId);
+
   const handleSimulationStateChange = (newState) => {
     setSimulationState(newState);
+  };
+
+  // Replay a simulation from history
+  const handleReplaySimulation = (historyItem) => {
+    // Find the case
+    const caseToReplay = exampleCases.find(c => c.id === historyItem.caseId);
+    if (caseToReplay) {
+      // This will trigger the simulation in the Sidebar
+      // We need to switch to the cases tab and run the simulation
+      // For now, just log - will be implemented with Sidebar state
+      console.log('Replaying simulation:', historyItem);
+      alert(`Replay functionality: Switch to Example Cases tab and run "${historyItem.caseName}"`);
+    } else {
+      alert('Case not found. It may have been deleted.');
+    }
+  };
+
+  // Add simulation to history (called from SimulationPanel when simulation completes)
+  const handleSimulationComplete = (simulationData) => {
+    addToHistory(simulationData);
   };
 
   // Log session initialization (for verification)
@@ -407,6 +446,11 @@ function App() {
           triggerAutoSave={triggerAutoSave}
           simulationState={simulationState}
           onSimulationStateChange={handleSimulationStateChange}
+          simulationHistory={simulationHistory}
+          onReplaySimulation={handleReplaySimulation}
+          onDeleteHistoryItem={deleteHistoryItem}
+          onClearHistory={clearHistory}
+          onSimulationComplete={handleSimulationComplete}
         />
       </ReactFlowProvider>
 
