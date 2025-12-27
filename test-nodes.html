@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Node Creation</title>
+  <script>
+    // Open console and paste this to test if browser can access the app
+    fetch('http://localhost:5177')
+      .then(r => r.text())
+      .then(html => console.log('App loaded:', html.includes('root')))
+      .catch(e => console.error('Error:', e));
+  </script>
+</head>
+<body>
+  <h1>Open browser console (F12)</h1>
+  <p>Check console for App logs when clicking Add Node button</p>
+  <p>Navigate to: <a href="http://localhost:5177">http://localhost:5177</a></p>
+</body>
+</html>
