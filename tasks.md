@@ -719,32 +719,32 @@ Phase 3 Step 6 Completion Notes (2024-12-27):
 ---
 
 ## Phase 5: Example Cases & Basic Flow Simulation
-**Status**: ⬜ Not Started
+**Status**: 🔄 In Progress
 **Duration**: 7-10 days
-**Started**: _____
+**Started**: 2024-12-27
 **Completed**: _____
 **Deliverable**: Define example cases, run basic simulation with path highlighting
 
 ### Tasks
-- [ ] **Create Example Case Data Structure**
-  - [ ] Define example case schema (id, name, description, input, expectedPath)
-  - [ ] Add `exampleCases` array to diagram state
-  - [ ] Store in diagram JSON
+- [x] **Create Example Case Data Structure** ✅ COMPLETED
+  - [x] Define example case schema (id, name, description, input, expectedPath)
+  - [x] Add `exampleCases` array to diagram state
+  - [x] Store in diagram JSON
 
-- [ ] **Build Example Case Manager UI**
-  - [ ] Add "Example Cases" tab in sidebar
-  - [ ] List all saved cases
-  - [ ] "Add Case" button opens modal
-  - [ ] Form: name, description, starting node, input data
-  - [ ] Edit/delete case options
+- [x] **Build Example Case Manager UI** ✅ COMPLETED
+  - [x] Add "Example Cases" tab in sidebar
+  - [x] List all saved cases
+  - [x] "Add Case" button opens modal
+  - [x] Form: name, description, starting node, input data
+  - [x] Edit/delete case options
 
-- [ ] **Implement Simulation Engine**
-  - [ ] Install `expr-eval` library for condition evaluation
-  - [ ] Create `simulateFlow()` function
-  - [ ] Start at input node, evaluate conditions
-  - [ ] Build path array: `[nodeId1, nodeId2, ...]`
-  - [ ] Return path and evaluation results
-  - [ ] Handle errors (invalid conditions, circular paths)
+- [x] **Implement Simulation Engine** ✅ COMPLETED
+  - [x] Install `expr-eval` library for condition evaluation
+  - [x] Create `simulateFlow()` function
+  - [x] Start at input node, evaluate conditions
+  - [x] Build path array: `[nodeId1, nodeId2, ...]`
+  - [x] Return path and evaluation results
+  - [x] Handle errors (invalid conditions, circular paths)
 
 - [ ] **Create Simulation UI Controls**
   - [ ] Simulation panel in sidebar
@@ -770,7 +770,147 @@ Phase 3 Step 6 Completion Notes (2024-12-27):
 
 ### Notes
 ```
-[Add notes, blockers, or observations here]
+Phase 5 Step 2 Completion Notes (2024-12-27):
+- Created ExampleCaseForm component (src/components/ExampleCaseForm.jsx):
+  * Modal dialog for adding/editing example cases
+  * Name and description text inputs
+  * Starting node selector (dropdown with all nodes)
+  * Input data editor with two modes:
+    - Key-Value Pairs mode: Dynamic field list with add/remove functionality
+    - JSON mode: Text area with JSON validation
+  * Auto-parses values (numbers, booleans, JSON objects)
+  * Form validation (required: name, starting node)
+  * Professional styling with theme colors
+  * Edit mode pre-fills form with existing case data
+
+- Created ExampleCasesList component (src/components/ExampleCasesList.jsx):
+  * Displays all saved example cases in card layout
+  * Shows case name, description, starting node, input data summary
+  * Edit and delete buttons for each case
+  * Delete confirmation dialog to prevent accidental deletion
+  * Empty state with helpful message
+  * Professional styling with hover effects
+
+- Updated Sidebar component (src/components/Sidebar.jsx):
+  * Added tab system with "Tools" and "Example Cases" tabs
+  * Tabs with icons (Wrench for Tools, FlaskConical for Example Cases)
+  * Active tab indicator with blue underline and background
+  * Example Cases tab shows:
+    - "Add Case" button in header
+    - ExampleCasesList component
+  * Modal form opens on "Add Case" or edit button click
+  * Full CRUD functionality integrated
+
+- Integrated into App.jsx:
+  * Imported addExampleCase, updateExampleCase, deleteExampleCase from useDiagramState
+  * Passed example cases and CRUD functions to Sidebar
+  * Passed nodes list to Sidebar for starting node dropdown
+  * Full data flow: Sidebar → DiagramContent → Sidebar props
+
+- Example case data structure (per architect.md Section 6.1):
+  * id: UUID v4
+  * name: Case name (required)
+  * description: Case description (optional)
+  * input: { nodeId, data } - Starting node and input data object
+  * expectedPath: Array of node IDs (for future simulation validation)
+  * highlights: Array of edge highlights (for future simulation display)
+
+- Example case operations:
+  * addExampleCase: Adds new case to state, normalizes data
+  * updateExampleCase: Updates existing case by ID
+  * deleteExampleCase: Removes case by ID
+  * All operations auto-trigger auto-save (30-second debounce)
+  * Cases persist to localStorage with diagram data
+
+- Input data handling:
+  * Key-Value mode: Easy for simple data (age: 25, name: "John")
+  * JSON mode: Advanced for complex nested objects
+  * Auto-type conversion: "25" → 25, "true" → true, '{"x":1}' → {x:1}
+  * Validation prevents invalid JSON in JSON mode
+
+- Dev server tested and confirmed working (port 5173)
+- All Phase 5 Step 2 requirements implemented and verified
+- Ready for Phase 5 Step 3: Simulation Engine
+
+Phase 5 Step 3 Completion Notes (2024-12-27):
+- Installed expr-eval library (v2.1.4):
+  * Safe expression evaluation library
+  * Supports mathematical and logical operators
+  * Handles string comparisons and boolean logic
+  * No eval() - secure parsing and execution
+
+- Created simulation engine module (src/utils/simulationEngine.js):
+  * simulateFlow(exampleCase, nodes, edges) - Main simulation function
+  * validateCondition(condition) - Validates condition syntax
+  * testCondition(condition, data) - Tests condition with sample data
+  * evaluateDecisionNode(edges, data) - Private function for condition evaluation
+
+- simulateFlow() functionality:
+  * Takes example case with input data
+  * Starts at specified input node
+  * Traverses edges based on conditional logic
+  * Evaluates conditions at decision nodes using expr-eval Parser
+  * Builds path array of node IDs: [nodeId1, nodeId2, ...]
+  * Tracks detailed steps with data at each node
+  * Returns comprehensive result object
+
+- Result object structure:
+  * success: boolean - Whether simulation completed successfully
+  * path: array - Array of node IDs in traversal order
+  * steps: array - Detailed step-by-step execution:
+    - stepIndex: Step number
+    - nodeId, nodeName, nodeType: Node information
+    - inputData, outputData: Data at this step
+    - transformations: Array of transformations (Phase 6)
+    - edgeTaken: Edge used to reach this node
+    - conditionEvaluated: Condition result and message
+  * endReason: 'terminal_node' | 'error'
+  * message: Human-readable completion message
+  * error: Error message (if success = false)
+
+- Condition evaluation:
+  * Uses expr-eval Parser for safe expression parsing
+  * Supports complex expressions: age > 18, status == 'active', etc.
+  * Creates context with 'input' prefix and direct access
+  * Sorts edges by priority (lower = higher priority)
+  * Returns first edge where condition evaluates to true
+  * Supports default/fallback paths (no condition)
+
+- Error handling implemented:
+  * Invalid example case (missing input node)
+  * Starting node not found
+  * Invalid condition syntax
+  * Circular path detection (visited nodes tracking)
+  * Dead ends (no outgoing edges = terminal node, not error)
+  * No condition matched (all false, no default)
+  * Maximum steps exceeded (100 steps to prevent infinite loops)
+  * Target node not found
+
+- Helper functions:
+  * validateCondition(condition): Validates syntax without executing
+  * testCondition(condition, data): Tests with sample data
+  * Both return success/error objects with messages
+
+- Test suite created (src/utils/simulationEngine.test.js):
+  * Test 1: Simple linear path (no decisions) - ✅ PASSED
+  * Test 2: Decision node with age > 18 - ✅ PASSED
+    - Adult case (age=25) takes adult path
+    - Minor case (age=16) takes minor path
+  * Test 3: Condition validation - ✅ PASSED
+    - Valid conditions accepted
+    - Invalid syntax detected
+    - Empty conditions handled
+  * Test 4: Condition evaluation - ✅ PASSED
+    - Numeric comparisons work
+    - String comparisons work
+  * Test 5: Circular path detection - ✅ PASSED
+    - Detects and prevents infinite loops
+  * Test 6: Invalid condition handling - ✅ PASSED
+    - Returns error with helpful message
+
+- All tests passing successfully
+- Simulation engine ready for UI integration (Phase 5 Step 4)
+- Ready for Phase 5 Step 4: Simulation UI Controls
 ```
 
 ---

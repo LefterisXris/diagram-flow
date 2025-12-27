@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNodesState, useEdgesState } from "reactflow";
 import { normalizeConditionalEdge } from "../utils/edgeConditions";
+import { normalizeExampleCase, normalizeExampleCases } from "../utils/exampleCases";
 
 const STORAGE_KEY = "diagram_current";
 const AUTOSAVE_DELAY = 30000; // 30 seconds
@@ -8,6 +9,7 @@ const AUTOSAVE_DELAY = 30000; // 30 seconds
 export const useDiagramState = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [exampleCases, setExampleCases] = useState([]);
   const [lastSaved, setLastSaved] = useState(null);
   const [isDirty, setIsDirty] = useState(false);
 
@@ -16,10 +18,11 @@ export const useDiagramState = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        const { nodes: savedNodes, edges: savedEdges } = JSON.parse(saved);
+        const { nodes: savedNodes, edges: savedEdges, exampleCases: savedCases } = JSON.parse(saved);
         const normalizedEdges = (savedEdges || []).map((edge) => normalizeConditionalEdge(edge));
         setNodes(savedNodes || []);
         setEdges(normalizedEdges);
+        setExampleCases(normalizeExampleCases(savedCases));
         setIsDirty(false);
       } catch (e) {
         console.error("Failed to load diagram:", e);
@@ -32,7 +35,7 @@ export const useDiagramState = () => {
     if (lastSaved !== null) {
       setIsDirty(true);
     }
-  }, [nodes, edges, lastSaved]);
+  }, [nodes, edges, exampleCases, lastSaved]);
 
   const addNode = useCallback((position, type = "generic", icon = null) => {
     const now = new Date().toISOString();
@@ -60,6 +63,28 @@ export const useDiagramState = () => {
     };
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes]);
+
+  const addExampleCase = useCallback((exampleCase) => {
+    setExampleCases((cases) => [...cases, normalizeExampleCase(exampleCase)]);
+  }, []);
+
+  const updateExampleCase = useCallback((exampleCaseId, updates) => {
+    setExampleCases((cases) =>
+      cases.map((exampleCase) =>
+        exampleCase.id === exampleCaseId
+          ? normalizeExampleCase({
+            ...exampleCase,
+            ...updates,
+            id: exampleCase.id,
+          })
+          : exampleCase
+      )
+    );
+  }, []);
+
+  const deleteExampleCase = useCallback((exampleCaseId) => {
+    setExampleCases((cases) => cases.filter((exampleCase) => exampleCase.id !== exampleCaseId));
+  }, []);
 
   const deleteNode = useCallback((nodeId) => {
     setNodes((nds) => nds.filter((n) => n.id !== nodeId));
@@ -93,13 +118,14 @@ export const useDiagramState = () => {
     const data = {
       nodes,
       edges,
+      exampleCases,
       viewport,
       lastModified: Date.now()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     setLastSaved(Date.now());
     setIsDirty(false);
-  }, [nodes, edges]);
+  }, [nodes, edges, exampleCases]);
 
   // Auto-save with debounce (called from parent with viewport)
   const triggerAutoSave = useCallback((viewport) => {
@@ -109,13 +135,18 @@ export const useDiagramState = () => {
   return {
     nodes,
     edges,
+    exampleCases,
     onNodesChange,
     onEdgesChange,
     addNode,
     deleteNode,
     updateNode,
+    addExampleCase,
+    updateExampleCase,
+    deleteExampleCase,
     setNodes,
     setEdges,
+    setExampleCases,
     lastSaved,
     isDirty,
     saveState,
