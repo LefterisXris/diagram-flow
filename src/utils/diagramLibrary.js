@@ -4,6 +4,8 @@
  * Maintains index in: diagram_list
  */
 
+import { normalizeExampleCases } from './exampleCases';
+
 const DIAGRAM_LIST_KEY = 'diagram_list';
 const DIAGRAM_PREFIX = 'diagram_';
 
@@ -35,10 +37,11 @@ export function listDiagrams() {
  * @param {Array} diagram.nodes - React Flow nodes
  * @param {Array} diagram.edges - React Flow edges
  * @param {Object} diagram.viewport - Viewport state (zoom, x, y)
+ * @param {Array} diagram.exampleCases - Example cases
  * @param {string} [diagram.id] - Optional diagram ID (generates UUID if not provided)
  * @returns {Object} Saved diagram metadata
  */
-export function saveDiagram({ name, nodes, edges, viewport, id }) {
+export function saveDiagram({ name, nodes, edges, viewport, exampleCases, id }) {
   // Generate ID if not provided
   const diagramId = id || crypto.randomUUID();
   const now = new Date().toISOString();
@@ -72,6 +75,7 @@ export function saveDiagram({ name, nodes, edges, viewport, id }) {
     nodes: nodes || [],
     edges: edges || [],
     viewport: viewport || { zoom: 1, x: 0, y: 0 },
+    exampleCases: normalizeExampleCases(exampleCases),
   };
 
   // Save diagram data

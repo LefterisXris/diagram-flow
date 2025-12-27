@@ -13,21 +13,54 @@ DiagramFlow is an interactive flow diagram tool for developers and architects. C
 
 ## ✨ Features
 
-### Current (Phase 1)
+### Phase 0-5 Complete (60% Done)
+
+**Foundation & Core**
 - ✅ **Interactive Node Creation** - Click button or double-click canvas to add nodes
+- ✅ **Multiple Node Types** - Service, Database, Client, Decision, Generic nodes with icons
 - ✅ **Edge Connections** - Drag from node handles to create animated connections
 - ✅ **Drag & Drop** - Move nodes freely; edges follow automatically
-- ✅ **Auto-Save** - Changes persist to localStorage every 10 seconds
 - ✅ **Theme Support** - Dark and light themes with smooth transitions
-- ✅ **Professional UI** - Clean, modern interface with Tailwind CSS
+- ✅ **Professional UI** - Clean, modern interface with Tailwind CSS v4
 
-### Coming Soon (Phases 2-9)
-- 🔜 **Multiple Node Types** - Service, Database, Client, Decision, Infrastructure
-- 🔜 **Rich Metadata** - Add descriptions, tags, owners, links to nodes
-- 🔜 **Conditional Logic** - Define branching paths with decision nodes
-- 🔜 **Flow Simulation** - Run example cases and watch data flow step-by-step
-- 🔜 **Mermaid Import** - Convert existing Mermaid diagrams to DiagramFlow
-- 🔜 **Export Formats** - Save as JSON, PNG, SVG, or standalone HTML
+**Rich Metadata**
+- ✅ **Node Details Panel** - Add descriptions, metadata, tags, and custom links
+- ✅ **Icon Library** - Choose from hundreds of Lucide icons for each node
+- ✅ **Node Status** - Track deployment status (Planned, In Progress, Deployed, Deprecated)
+- ✅ **Ownership** - Assign owners, teams, and criticality levels
+- ✅ **Versioning** - Track when nodes were added and last modified
+
+**State Persistence & File Management**
+- ✅ **Auto-Save** - Changes persist to localStorage with 30-second debounce
+- ✅ **Session Management** - Cookie-based sessions with localStorage persistence
+- ✅ **Save/Load Diagrams** - Save multiple diagrams and switch between them
+- ✅ **Export/Import JSON** - VCS-friendly JSON format for version control
+- ✅ **Mermaid Import** - Convert Mermaid flowcharts to DiagramFlow diagrams
+
+**Conditional Logic & Branching**
+- ✅ **Decision Nodes** - Create branching logic with decision nodes
+- ✅ **Conditional Edges** - Define conditions on edges (true/false paths)
+- ✅ **Condition Editor** - Visual editor for edge conditions and priorities
+- ✅ **Conditional Highlighting** - Edges highlight when hovering over decision nodes
+
+**Flow Simulation**
+- ✅ **Example Cases** - Define test cases with input data and expected paths
+- ✅ **Case Manager UI** - Create, edit, delete example cases with rich editor
+- ✅ **Simulation Engine** - Execute flows with conditional evaluation (expr-eval)
+- ✅ **Playback Controls** - Play, pause, step forward/back, reset, speed control (0.5x-3x)
+- ✅ **Path Highlighting** - Active nodes pulse with blue glow, past nodes green, upcoming gray
+- ✅ **Edge Animation** - Active edges brighten and animate during simulation
+- ✅ **Progress Tracking** - Step counter and progress bar during simulation
+
+### Coming Soon (Phases 6-9)
+- 🔜 **Data Transformation Tracking** - See how data changes at each node
+- 🔜 **Data Inspector Panel** - View input/output data at each step
+- 🔜 **Conditional Evaluation Display** - See which conditions evaluated to true/false
+- 🔜 **Multiple Case Comparison** - Run and compare multiple cases side-by-side
+- 🔜 **Pet Clinic Template** - Pre-built example diagram for onboarding
+- 🔜 **Advanced Search** - Find nodes, edges, and metadata across diagrams
+- 🔜 **Diagram Validation** - Check for errors, circular paths, dead ends
+- 🔜 **Export Formats** - Export as PNG, SVG, or standalone HTML
 
 ---
 
@@ -93,10 +126,57 @@ npm run healthcheck
 - **Pan**: Click and drag on empty canvas space
 - **Fit View**: Click the frame icon to see all nodes
 
-### Saving Your Work
+### Editing Node Details
 
-- **Auto-save**: Changes save automatically every 10 seconds
-- **Manual save**: Wait for auto-save or refresh to verify persistence
+1. **Click on any node** to open the detail panel (right side)
+2. Edit node properties:
+   - **Label** - Node display name
+   - **Icon** - Choose from icon library
+   - **Description** - Short and detailed descriptions (Markdown supported)
+   - **Status** - Planned, In Progress, Deployed, Deprecated
+   - **Metadata** - Owner, version, criticality, tech stack
+   - **Tags** - Categorize with custom tags
+   - **Links** - Add documentation, repository, monitoring links
+3. Changes save automatically
+
+### Creating Conditional Logic
+
+1. **Add a Decision node** from the sidebar (orange diamond icon)
+2. **Create edges** from the decision node to other nodes
+3. **Click on an edge** to open the condition editor (right side)
+4. Define the condition:
+   - **Condition Type** - True path, False path, or Default
+   - **Expression** - e.g., `age > 18`, `status == "active"`
+   - **Priority** - Evaluation order (lower = higher priority)
+5. Edges will show condition labels and highlight on hover
+
+### Running Simulations
+
+1. **Navigate to "Example Cases" tab** in the sidebar
+2. **Click "Add Case"** to create a new test case:
+   - **Name & Description** - Describe the scenario
+   - **Starting Node** - Select where the flow starts
+   - **Input Data** - Define test data (key-value or JSON mode)
+3. **Click "Run Simulation"** to start the simulation
+4. **Use playback controls**:
+   - ▶️ Play - Auto-advance through steps
+   - ⏸️ Pause - Stop auto-play
+   - ⏮️ Step Back - Go to previous step
+   - ⏭️ Step Forward - Go to next step
+   - 🔄 Reset - Return to start
+   - 🎚️ Speed - Adjust playback speed (0.5x to 3x)
+5. **Watch the diagram**:
+   - Current node pulses with blue glow
+   - Past nodes show green with check marks
+   - Upcoming nodes shown in gray
+   - Edges highlight as they're traversed
+
+### Saving & Loading Diagrams
+
+- **Auto-save**: Changes save automatically every 30 seconds to current session
+- **Save Diagram**: Click "Save" in header to save to library
+- **Load Diagram**: Click "Open" to see all saved diagrams
+- **Export/Import**: Use "Export" to download JSON, "Import" to load from file
 - **Clear data**: Open browser console (F12) and run `localStorage.clear()`
 
 ---
@@ -106,17 +186,21 @@ npm run healthcheck
 ### Core
 - **React 19** - UI framework with latest features
 - **React Flow 11** - Interactive node-based diagrams
-- **Vite** - Lightning-fast build tool and dev server
+- **Vite 7** - Lightning-fast build tool and dev server
+- **expr-eval** - Safe expression evaluation for conditional logic
 
 ### Styling
-- **Tailwind CSS v3** - Utility-first CSS framework
-- **Lucide React** - Beautiful icon library
+- **Tailwind CSS v4** - Utility-first CSS framework (latest @next version)
+- **Lucide React** - Beautiful icon library (700+ icons)
 - **CSS Custom Properties** - Theme system with dark/light modes
+- **CSS Animations** - Smooth pulsing effects for simulation
 
 ### State Management
 - **React Hooks** - useState, useCallback, useMemo, useEffect
-- **localStorage** - Client-side persistence
-- **js-cookie** - Session management
+- **Custom Hooks** - useDiagramState, useSimulation, useTheme, useSession
+- **localStorage** - Client-side persistence for diagrams and sessions
+- **sessionStorage** - Undo/redo state (future feature)
+- **js-cookie** - Cookie-based session management
 
 ---
 
@@ -125,32 +209,60 @@ npm run healthcheck
 ```
 diagramflow/
 ├── src/
-│   ├── components/          # React components
-│   │   ├── nodes/          # Custom node types
-│   │   │   └── GenericNode.jsx
-│   │   ├── Header.jsx      # Top navigation bar
-│   │   ├── Sidebar.jsx     # Left tool panel
-│   │   ├── Canvas.jsx      # React Flow canvas
-│   │   └── ThemeToggle.jsx # Theme switcher
-│   ├── contexts/           # React contexts
+│   ├── components/                # React components
+│   │   ├── nodes/                # Custom node types
+│   │   │   ├── GenericNode.jsx
+│   │   │   ├── ServiceNode.jsx
+│   │   │   ├── DatabaseNode.jsx
+│   │   │   ├── ClientNode.jsx
+│   │   │   └── DecisionNode.jsx
+│   │   ├── Header.jsx            # Top navigation bar
+│   │   ├── Sidebar.jsx           # Left tool panel with tabs
+│   │   ├── Canvas.jsx            # React Flow canvas
+│   │   ├── ThemeToggle.jsx       # Theme switcher
+│   │   ├── IconPicker.jsx        # Icon library picker
+│   │   ├── NodeDetailPanel.jsx   # Node metadata editor
+│   │   ├── EdgeConditionPanel.jsx # Edge condition editor
+│   │   ├── ExampleCaseForm.jsx   # Create/edit case modal
+│   │   ├── ExampleCasesList.jsx  # List of test cases
+│   │   ├── SimulationPanel.jsx   # Simulation controls
+│   │   ├── SaveDiagramDialog.jsx # Save dialog
+│   │   ├── OpenDiagramDialog.jsx # Load dialog
+│   │   └── MermaidImportDialog.jsx # Mermaid import
+│   ├── contexts/                 # React contexts
 │   │   ├── ThemeContext.jsx
 │   │   └── ThemeContextDef.js
-│   ├── hooks/              # Custom hooks
+│   ├── hooks/                    # Custom hooks
 │   │   ├── useTheme.js
-│   │   └── useDiagramState.js
-│   ├── themes/             # Theme definitions
+│   │   ├── useDiagramState.js
+│   │   ├── useSimulation.js
+│   │   └── useSession.js
+│   ├── themes/                   # Theme definitions
 │   │   └── index.js
-│   ├── config/             # Configuration
+│   ├── config/                   # Configuration
 │   │   └── nodeTypes.js
-│   ├── App.jsx             # Root component
-│   ├── main.jsx            # Entry point
-│   └── index.css           # Global styles
-├── scripts/                # Utility scripts
-│   └── healthcheck.js      # App health verification
-├── architect.md            # Requirements document
-├── plan.md                 # Implementation roadmap
-├── tasks.md                # Task tracker
-└── README.md               # This file
+│   ├── utils/                    # Utility functions
+│   │   ├── diagramLibrary.js     # Save/load diagrams
+│   │   ├── exportDiagram.js      # Export to JSON
+│   │   ├── importDiagram.js      # Import from JSON
+│   │   ├── mermaidImport.js      # Mermaid parser
+│   │   ├── edgeConditions.js     # Edge condition utilities
+│   │   ├── exampleCases.js       # Case normalization
+│   │   ├── simulationEngine.js   # Flow execution engine
+│   │   └── simulationHighlighting.js # Visual highlighting
+│   ├── templates/                # Diagram templates
+│   │   └── petClinic.js          # Pet Clinic example (future)
+│   ├── App.jsx                   # Root component
+│   ├── main.jsx                  # Entry point
+│   └── index.css                 # Global styles + animations
+├── scripts/                      # Utility scripts
+│   └── healthcheck.js            # App health verification
+├── implementation-phase*.md      # Step-by-step guides
+├── architect.md                  # Requirements document
+├── plan.md                       # Implementation roadmap
+├── tasks.md                      # Task tracker
+├── CLAUDE.md                     # AI assistant guidelines
+└── README.md                     # This file
 ```
 
 ---
@@ -212,19 +324,46 @@ Themes persist to `localStorage` with key `diagram_theme`.
 
 ### localStorage Keys
 
-- `diagram_current` - Current diagram state (nodes, edges)
+- `diagram_current` - Current diagram state (nodes, edges, example cases, viewport)
+- `diagram_<id>` - Saved diagrams with metadata
+- `diagram_list` - Index of all saved diagrams
 - `diagram_theme` - User's theme preference (dark/light)
+- `diagram_session_*` - Session-specific data (cookie-based)
 
 ### Data Format
 
 ```json
 {
+  "version": "1.0.0",
+  "metadata": {
+    "id": "uuid",
+    "name": "My Diagram",
+    "createdAt": "2024-12-27T10:00:00Z",
+    "lastModified": "2024-12-27T15:30:00Z"
+  },
   "nodes": [
     {
       "id": "uuid",
-      "type": "generic",
+      "type": "service",
       "position": { "x": 250, "y": 150 },
-      "data": { "label": "Node Name" }
+      "data": {
+        "label": "API Gateway",
+        "icon": "Server",
+        "shortDescription": "Main entry point",
+        "detailedDescription": "# API Gateway\nHandles all requests...",
+        "metadata": {
+          "status": "deployed",
+          "owner": "Platform Team",
+          "version": "2.3.1",
+          "criticality": "high",
+          "tags": ["core", "infrastructure"],
+          "links": [
+            { "url": "https://docs.example.com", "label": "Documentation" }
+          ],
+          "dateAdded": "2024-12-26T10:00:00Z",
+          "dateModified": "2024-12-27T15:30:00Z"
+        }
+      }
     }
   ],
   "edges": [
@@ -233,10 +372,29 @@ Themes persist to `localStorage` with key `diagram_theme`.
       "source": "node1-id",
       "target": "node2-id",
       "animated": true,
-      "type": "smoothstep"
+      "type": "smoothstep",
+      "label": "if age > 18",
+      "data": {
+        "condition": "age > 18",
+        "conditionType": "true",
+        "priority": 1
+      }
     }
   ],
-  "lastModified": 1234567890
+  "exampleCases": [
+    {
+      "id": "uuid",
+      "name": "Adult User Registration",
+      "description": "User with age > 18",
+      "input": {
+        "nodeId": "start-node-id",
+        "data": { "age": 25, "name": "John" }
+      },
+      "expectedPath": ["node-1", "node-2", "node-3"],
+      "highlights": []
+    }
+  ],
+  "viewport": { "zoom": 1, "x": 0, "y": 0 }
 }
 ```
 
@@ -267,31 +425,56 @@ Themes persist to `localStorage` with key `diagram_theme`.
 
 ## 🗺️ Roadmap
 
-### Phase 0: Foundation ✅ COMPLETE
-- Project setup with Vite + React
-- Tailwind CSS integration
+### Phase 0: Foundation ✅ COMPLETE (Dec 26-27)
+- Project setup with Vite + React 19
+- Tailwind CSS v4 integration
 - Theme system (dark/light modes)
 - Basic UI layout (Header, Sidebar, Canvas)
 
-### Phase 1: Basic Node & Edge Management ✅ COMPLETE
+### Phase 1: Basic Node & Edge Management ✅ COMPLETE (Dec 27)
 - Node creation (button + double-click)
 - Edge creation via drag-and-drop
 - Node dragging with automatic edge adjustment
 - State persistence with auto-save
 
-### Phase 2: Node Types & Rich Metadata 🔜 NEXT
-- Multiple node types (Service, Database, Client, etc.)
-- Icon support with Lucide React
-- Metadata editor (descriptions, tags, links)
+### Phase 2: Node Types & Rich Metadata ✅ COMPLETE (Dec 27)
+- Multiple node types (Service, Database, Client, Decision, Generic)
+- Icon support with Lucide React (700+ icons)
+- Metadata editor (descriptions, tags, links, ownership)
 - Detail panel for node properties
 
-### Phases 3-9
+### Phase 3: State Persistence & File Management ✅ COMPLETE (Dec 27)
+- Session management with cookies
+- Save/load multiple diagrams
+- Export/import JSON (VCS-friendly format)
+- Mermaid flowchart import
+- Auto-save with debounce
+
+### Phase 4: Conditional Nodes & Branching Logic ✅ COMPLETE (Dec 27)
+- Decision node type with diamond shape
+- Conditional edge editor (condition, type, priority)
+- Visual condition indicators
+- Edge highlighting on decision node hover
+
+### Phase 5: Example Cases & Flow Simulation ✅ COMPLETE (Dec 27)
+- Example case manager UI (create, edit, delete)
+- Simulation engine with expr-eval
+- Playback controls (play, pause, step, reset, speed)
+- Path highlighting (active, past, upcoming nodes/edges)
+- Real-time visual feedback with animations
+
+### Phase 6: Advanced Simulation Features 🔜 NEXT
+- Data transformation tracking at each node
+- Data inspector panel with diff view
+- Conditional evaluation display
+- Multiple case comparison
+- Simulation history and replay
+
+### Phases 7-9
 See `plan.md` for complete roadmap including:
-- File management (save/load diagrams)
-- Conditional logic and decision nodes
-- Flow simulation with example cases
-- Mermaid import tool
-- Advanced features (search, validation, export)
+- Pet Clinic template for onboarding
+- Advanced search and validation
+- Export formats (PNG, SVG, HTML)
 - Documentation and deployment
 
 ---

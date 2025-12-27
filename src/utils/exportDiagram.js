@@ -4,8 +4,9 @@
  */
 
 import { createConditionalEdgeData, getConditionalEdgeLabel } from "./edgeConditions";
+import { normalizeExampleCases } from "./exampleCases";
 
-export const exportDiagram = (nodes, edges, viewport, diagramName = "diagram") => {
+export const exportDiagram = (nodes, edges, viewport, diagramName = "diagram", exampleCases = []) => {
   // Get current timestamp
   const now = new Date().toISOString();
 
@@ -69,7 +70,7 @@ export const exportDiagram = (nodes, edges, viewport, diagramName = "diagram") =
         metadata: edge.metadata || {},
       };
     }),
-    exampleCases: [],
+    exampleCases: normalizeExampleCases(exampleCases),
     layout: {
       zoom: viewport?.zoom || 1.0,
       center: {

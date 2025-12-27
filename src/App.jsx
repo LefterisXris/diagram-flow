@@ -14,14 +14,19 @@ import { exportDiagram } from "./utils/exportDiagram";
 import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
 import { applyConditionalEdgeHighlight, normalizeConditionalEdge } from "./utils/edgeConditions";
+import { normalizeExampleCases } from "./utils/exampleCases";
 
 // Wrapper component to access ReactFlow context
 function DiagramContent({
   nodes,
   edges,
+  exampleCases,
   onNodesChange,
   onEdgesChange,
   addNode,
+  addExampleCase,
+  updateExampleCase,
+  deleteExampleCase,
   onNodeClick,
   onEdgeClick,
   onPaneClick,
@@ -29,6 +34,7 @@ function DiagramContent({
   onNodeMouseLeave,
   setEdges,
   setNodes,
+  setExampleCases,
   selectedNode,
   selectedEdge,
   selectedEdgeSource,
@@ -43,12 +49,14 @@ function DiagramContent({
   isDirty,
   lastSaved,
   triggerAutoSave,
+  simulationState,
+  onSimulationStateChange,
 }) {
   const { getViewport, setViewport } = useReactFlow();
 
   const handleExport = () => {
     const viewport = getViewport();
-    exportDiagram(nodes, edges, viewport, "DiagramFlow");
+    exportDiagram(nodes, edges, viewport, "DiagramFlow", exampleCases);
     onExport();
   };
 
@@ -59,6 +67,7 @@ function DiagramContent({
       // Replace nodes and edges
       setNodes(result.data.nodes);
       setEdges(result.data.edges);
+      setExampleCases(result.data.exampleCases || []);
 
       // Restore viewport
       if (result.data.viewport) {
@@ -100,7 +109,16 @@ function DiagramContent({
         lastSaved={lastSaved}
       />
       <div className="flex-1 flex overflow-hidden">
-        <Sidebar onAddNode={addNode} />
+        <Sidebar
+          onAddNode={addNode}
+          exampleCases={exampleCases}
+          onAddExampleCase={addExampleCase}
+          onUpdateExampleCase={updateExampleCase}
+          onDeleteExampleCase={deleteExampleCase}
+          nodes={nodes}
+          edges={edges}
+          onSimulationStateChange={onSimulationStateChange}
+        />
         <Canvas
           nodes={nodes}
           edges={edges}
@@ -113,6 +131,7 @@ function DiagramContent({
           onNodeMouseEnter={onNodeMouseEnter}
           onNodeMouseLeave={onNodeMouseLeave}
           setEdges={setEdges}
+          simulationState={simulationState}
         />
         {selectedNode && (
           <NodeDetailPanel
@@ -145,12 +164,17 @@ function App() {
   const {
     nodes,
     edges,
+    exampleCases,
     onNodesChange,
     onEdgesChange,
     addNode,
     updateNode,
+    addExampleCase,
+    updateExampleCase,
+    deleteExampleCase,
     setEdges,
     setNodes,
+    setExampleCases,
     isDirty,
     lastSaved,
     triggerAutoSave,
@@ -166,6 +190,11 @@ function App() {
   const [showOpenDialog, setShowOpenDialog] = useState(false);
   const [showMermaidImportDialog, setShowMermaidImportDialog] = useState(false);
   const [pendingViewport, setPendingViewport] = useState(null);
+  const [simulationState, setSimulationState] = useState(null);
+
+  const handleSimulationStateChange = (newState) => {
+    setSimulationState(newState);
+  };
 
   // Log session initialization (for verification)
   if (isInitialized && sessionId) {
@@ -267,6 +296,7 @@ function App() {
       name,
       nodes,
       edges,
+      exampleCases,
       viewport: pendingViewport,
     });
 
@@ -291,6 +321,7 @@ function App() {
     if (diagram) {
       setNodes(diagram.nodes);
       setEdges(diagram.edges);
+      setExampleCases(normalizeExampleCases(diagram.exampleCases));
       setCurrentDiagramId(diagram.metadata.id);
       setCurrentDiagramName(diagram.metadata.name);
       setActiveDiagram(diagram.metadata.id);
@@ -308,6 +339,7 @@ function App() {
   const handleMermaidImport = (nodes, edges) => {
     setNodes(nodes);
     setEdges(edges);
+    setExampleCases([]);
     console.log(`Mermaid diagram imported: ${nodes.length} nodes, ${edges.length} edges`);
   };
 
@@ -323,9 +355,13 @@ function App() {
         <DiagramContent
           nodes={nodes}
           edges={edges}
+          exampleCases={exampleCases}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           addNode={addNode}
+          addExampleCase={addExampleCase}
+          updateExampleCase={updateExampleCase}
+          deleteExampleCase={deleteExampleCase}
           onNodeClick={handleNodeClick}
           onEdgeClick={handleEdgeClick}
           onPaneClick={handlePaneClick}
@@ -333,6 +369,7 @@ function App() {
           onNodeMouseLeave={handleNodeMouseLeave}
           setEdges={setEdges}
           setNodes={setNodes}
+          setExampleCases={setExampleCases}
           selectedNode={selectedNode}
           selectedEdge={selectedEdge}
           selectedEdgeSource={selectedEdgeSource}
@@ -347,6 +384,8 @@ function App() {
           isDirty={isDirty}
           lastSaved={lastSaved}
           triggerAutoSave={triggerAutoSave}
+          simulationState={simulationState}
+          onSimulationStateChange={handleSimulationStateChange}
         />
       </ReactFlowProvider>
 

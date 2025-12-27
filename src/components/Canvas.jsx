@@ -3,6 +3,7 @@ import ReactFlow, { Background, Controls, addEdge, useReactFlow } from "reactflo
 import "reactflow/dist/style.css";
 import { nodeTypes } from "../config/nodeTypes";
 import { createConditionalEdgeData, normalizeConditionalEdge } from "../utils/edgeConditions";
+import { applySimulationStylesToNodes, applySimulationStylesToEdges } from "../utils/simulationHighlighting";
 
 const Canvas = ({
   nodes,
@@ -16,6 +17,7 @@ const Canvas = ({
   onNodeMouseEnter,
   onNodeMouseLeave,
   setEdges,
+  simulationState,
 }) => {
   const { screenToFlowPosition } = useReactFlow();
 
@@ -50,6 +52,17 @@ const Canvas = ({
   // Memoize nodeTypes to prevent recreation
   const memoizedNodeTypes = useMemo(() => nodeTypes, []);
 
+  // Apply simulation highlighting to nodes and edges
+  const highlightedNodes = useMemo(
+    () => applySimulationStylesToNodes(nodes, simulationState),
+    [nodes, simulationState]
+  );
+
+  const highlightedEdges = useMemo(
+    () => applySimulationStylesToEdges(edges, simulationState),
+    [edges, simulationState]
+  );
+
   return (
     <div
       className="flex-1 relative"
@@ -61,8 +74,8 @@ const Canvas = ({
       onDoubleClick={handlePaneDoubleClick}
     >
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={highlightedNodes}
+        edges={highlightedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}

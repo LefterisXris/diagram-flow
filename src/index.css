@@ -6,3 +6,39 @@
 :root {
   /* Variables will be set by ThemeContext */
 }
+
+/* Simulation highlighting animations */
+@keyframes pulse-node {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(59, 130, 246, 1);
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+}
+
+.simulation-active-node {
+  animation: pulse-node 2s ease-in-out infinite, pulse-border 2s ease-in-out infinite;
+  border: 3px solid #3b82f6 !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6) !important;
+}
+
+.simulation-past-node {
+  opacity: 0.8;
+  border: 2px solid #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.simulation-upcoming-node {
+  opacity: 0.5;
+  border: 1px dashed #94a3b8 !important;
+}

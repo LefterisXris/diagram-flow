@@ -4,6 +4,7 @@
  */
 
 import { normalizeConditionalEdge } from "./edgeConditions";
+import { normalizeExampleCases } from "./exampleCases";
 
 /**
  * Validate the imported JSON structure
@@ -152,6 +153,7 @@ export const importDiagram = async (file) => {
     // Convert nodes and edges to React Flow format
     const nodes = parsedData.nodes.map(convertNodeToReactFlow);
     const edges = parsedData.edges.map(convertEdgeToReactFlow);
+    const exampleCases = normalizeExampleCases(parsedData.exampleCases);
 
     // Extract layout info
     const layout = parsedData.layout || {};
@@ -168,6 +170,7 @@ export const importDiagram = async (file) => {
         nodes,
         edges,
         viewport,
+        exampleCases,
         metadata: parsedData.metadata || {},
       },
     };
