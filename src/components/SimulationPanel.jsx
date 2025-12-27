@@ -508,6 +508,7 @@ const SimulationPanel = ({ exampleCases, selectedCaseId, nodes, edges, onSimulat
           </div>
         </div>
       </div>
+      )}
 
       {/* Path visualization */}
       <div className="space-y-2">
@@ -544,8 +545,6 @@ const SimulationPanel = ({ exampleCases, selectedCaseId, nodes, edges, onSimulat
           })}
         </div>
       </div>
-      </div>
-      )}
     </div>
   );
 };

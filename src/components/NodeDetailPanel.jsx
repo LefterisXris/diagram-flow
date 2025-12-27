@@ -1,11 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, Calendar, User, Tag, Link as LinkIcon, AlertCircle } from "lucide-react";
 import * as Icons from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
+const normalizeNodeData = (data = {}) => {
+  const metadata = data.metadata || {};
+
+  return {
+    ...data,
+    label: data.label || "",
+    shortDescription: data.shortDescription || "",
+    detailedDescription: data.detailedDescription || "",
+    metadata: {
+      status: metadata.status || "planned",
+      owner: metadata.owner || "",
+      criticality: metadata.criticality || "low",
+      version: metadata.version || "",
+      tags: Array.isArray(metadata.tags) ? metadata.tags : [],
+      links: Array.isArray(metadata.links) ? metadata.links : [],
+      dateAdded: metadata.dateAdded || "",
+      dateModified: metadata.dateModified || ""
+    }
+  };
+};
+
 const NodeDetailPanel = ({ node, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedData, setEditedData] = useState(node.data);
+  const [editedData, setEditedData] = useState(() => normalizeNodeData(node?.data));
+
+  useEffect(() => {
+    setEditedData(normalizeNodeData(node?.data));
+  }, [node]);
 
   if (!node) return null;
 
@@ -36,27 +61,27 @@ const NodeDetailPanel = ({ node, onClose, onUpdate }) => {
   };
 
   const addTag = (tag) => {
-    if (tag && !editedData.metadata.tags.includes(tag)) {
-      updateMetadata('tags', [...editedData.metadata.tags, tag]);
+    if (tag && !(editedData.metadata?.tags || []).includes(tag)) {
+      updateMetadata('tags', [...(editedData.metadata?.tags || []), tag]);
     }
   };
 
   const removeTag = (tagToRemove) => {
-    updateMetadata('tags', editedData.metadata.tags.filter(t => t !== tagToRemove));
+    updateMetadata('tags', (editedData.metadata?.tags || []).filter(t => t !== tagToRemove));
   };
 
   const addLink = () => {
-    updateMetadata('links', [...editedData.metadata.links, { url: '', label: '' }]);
+    updateMetadata('links', [...(editedData.metadata?.links || []), { url: '', label: '' }]);
   };
 
   const updateLink = (index, field, value) => {
-    const newLinks = [...editedData.metadata.links];
+    const newLinks = [...(editedData.metadata?.links || [])];
     newLinks[index] = { ...newLinks[index], [field]: value };
     updateMetadata('links', newLinks);
   };
 
   const removeLink = (index) => {
-    updateMetadata('links', editedData.metadata.links.filter((_, i) => i !== index));
+    updateMetadata('links', (editedData.metadata?.links || []).filter((_, i) => i !== index));
   };
 
   const formatDate = (isoString) => {
@@ -378,7 +403,7 @@ const NodeDetailPanel = ({ node, onClose, onUpdate }) => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-1">
-                {editedData.metadata.tags.length > 0 ? (
+                {editedData.metadata?.tags && editedData.metadata.tags.length > 0 ? (
                   editedData.metadata.tags.map((tag, index) => (
                     <span
                       key={index}

@@ -11,6 +11,7 @@ import SaveDiagramDialog from "./components/SaveDiagramDialog";
 import OpenDiagramDialog from "./components/OpenDiagramDialog";
 import MermaidImportDialog from "./components/MermaidImportDialog";
 import WelcomeScreen from "./components/WelcomeScreen";
+import TutorialOverlay from "./components/TutorialOverlay";
 import { useDiagramState } from "./hooks/useDiagramState";
 import { useSession } from "./hooks/useSession";
 import { useSimulationHistory } from "./hooks/useSimulationHistory";
@@ -19,6 +20,7 @@ import { importDiagram } from "./utils/importDiagram";
 import { saveDiagram, loadDiagram } from "./utils/diagramLibrary";
 import { applyConditionalEdgeHighlight, normalizeConditionalEdge } from "./utils/edgeConditions";
 import { normalizeExampleCases } from "./utils/exampleCases";
+import { petClinicTemplate } from "./templates/petClinic";
 
 // Wrapper component to access ReactFlow context
 function DiagramContent({
@@ -60,8 +62,12 @@ function DiagramContent({
   onDeleteHistoryItem,
   onClearHistory,
   onSimulationComplete,
+  templateJustLoaded,
+  setTemplateJustLoaded,
+  setSelectedNode,
+  onStartTutorial,
 }) {
-  const { getViewport, setViewport } = useReactFlow();
+  const { getViewport, setViewport, fitView } = useReactFlow();
 
   const handleExport = () => {
     const viewport = getViewport();
@@ -106,6 +112,28 @@ function DiagramContent({
     return () => clearTimeout(timer);
   }, [nodes, edges, getViewport, triggerAutoSave]);
 
+  // Handle template loading - fit view and select first node
+  useEffect(() => {
+    if (templateJustLoaded && nodes.length > 0) {
+      // Fit view to show all nodes with padding
+      setTimeout(() => {
+        fitView({ padding: 0.2, duration: 400 });
+      }, 100);
+
+      // Auto-select first node to show detail panel
+      setTimeout(() => {
+        const firstNode = nodes[0];
+        if (firstNode) {
+          setSelectedNode(firstNode);
+          console.log('💡 Tip: Click the "Example Cases" tab in the sidebar to run simulations!');
+        }
+      }, 500);
+
+      // Reset flag
+      setTemplateJustLoaded(false);
+    }
+  }, [templateJustLoaded, nodes, fitView, setSelectedNode, setTemplateJustLoaded]);
+
   return (
     <>
       <Header
@@ -116,6 +144,7 @@ function DiagramContent({
         onImportMermaid={onImportMermaid}
         isDirty={isDirty}
         lastSaved={lastSaved}
+        onStartTutorial={onStartTutorial}
       />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar
@@ -225,6 +254,8 @@ function App() {
   const [pendingViewport, setPendingViewport] = useState(null);
   const [simulationState, setSimulationState] = useState(null);
   const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
+  const [templateJustLoaded, setTemplateJustLoaded] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Simulation history tracking
   const {
@@ -418,22 +449,48 @@ function App() {
     // Mark as visited
     localStorage.setItem('has_visited', 'true');
 
-    // TODO: Phase 7 Step 4 - Load Pet Clinic template
-    // For now, just close the welcome screen
-    console.log('User chose: Start with Pet Clinic Template');
-    // Template loading will be implemented in Phase 7 Step 4
+    // Load Pet Clinic template
+    setNodes(petClinicTemplate.nodes);
+    setEdges(petClinicTemplate.edges);
+    setExampleCases(normalizeExampleCases(petClinicTemplate.exampleCases));
+
+    // Set flag to trigger viewport fit and node selection in DiagramContent
+    setTemplateJustLoaded(true);
+
+    // Close welcome screen
+    setShowWelcomeScreen(false);
+
+    console.log('Pet Clinic template loaded successfully');
   };
 
   const handleStartEmpty = () => {
     // Mark as visited
     localStorage.setItem('has_visited', 'true');
 
-    // Empty canvas is the default state, so just close welcome screen
+    // Close welcome screen
+    setShowWelcomeScreen(false);
+
+    // Empty canvas is the default state (nodes and edges already empty)
     console.log('User chose: Start with Empty Canvas');
   };
 
   const handleCloseWelcome = () => {
     setShowWelcomeScreen(false);
+  };
+
+  // Tutorial handlers
+  const handleStartTutorial = () => {
+    setShowTutorial(true);
+  };
+
+  const handleCompleteTutorial = () => {
+    setShowTutorial(false);
+    console.log('Tutorial completed! You\'re ready to build amazing diagrams.');
+  };
+
+  const handleSkipTutorial = () => {
+    setShowTutorial(false);
+    console.log('Tutorial skipped. You can restart it anytime from the Help menu.');
   };
 
   return (
@@ -484,6 +541,10 @@ function App() {
           onDeleteHistoryItem={deleteHistoryItem}
           onClearHistory={clearHistory}
           onSimulationComplete={handleSimulationComplete}
+          templateJustLoaded={templateJustLoaded}
+          setTemplateJustLoaded={setTemplateJustLoaded}
+          setSelectedNode={setSelectedNode}
+          onStartTutorial={handleStartTutorial}
         />
       </ReactFlowProvider>
 
@@ -517,6 +578,13 @@ function App() {
           onClose={handleCloseWelcome}
         />
       )}
+
+      {/* Interactive Tutorial */}
+      <TutorialOverlay
+        isActive={showTutorial}
+        onComplete={handleCompleteTutorial}
+        onSkip={handleSkipTutorial}
+      />
     </div>
   );
 }
